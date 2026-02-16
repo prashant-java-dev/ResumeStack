@@ -1,29 +1,32 @@
 # Dependencies
 node_modules/
-dist/
-build/
-target/
-out/
+.pnp
+.pnp.js
 
-# Environment Variables
+# Testing
+coverage/
+
+# Production
+build/
+dist/
+target/
+
+# Misc
+.DS_Store
 .env
 .env.local
-.env.production
-.env.development
-
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.iml
-.DS_Store
-
-# Logs
+.env.development.local
+.env.test.local
+.env.production.local
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-logs/
-*.log
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.iml
 
 # OS
 Thumbs.db
