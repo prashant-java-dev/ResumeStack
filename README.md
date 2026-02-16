@@ -61,7 +61,7 @@ To deploy the full project:
 2.  **Backend:** Package the Spring Boot app using `./mvnw package` and deploy the JAR file to AWS, Heroku, or any Java-supporting cloud provider.
 
 ## Author
-[Prashant](https://github.com/prashant-java-dev)
+[Prashant Sharma ](https://github.com/prashant-java-dev)
 
 ---
 *Created with professional standards for reliability and ease of use.*
