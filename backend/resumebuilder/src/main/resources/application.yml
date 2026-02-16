@@ -1,0 +1,40 @@
+server:
+  port: ${PORT:8080}
+
+spring:
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/resume}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${gmailUsername}
+    password: ${gmailPassword}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+jwt:
+  secret: ${JWT_SECRET:THIS_IS_DEFAULT_ChangeMeInProduction}
+  expiration: ${JWT_EXPIRATION:86400000}
+
+oauth:
+  google:
+    clientId: ${GOOGLE_CLIENT_ID}
+    clientSecret: ${GOOGLE_CLIENT_SECRET}
+  linkedin:
+    clientId: ${LINKEDIN_CLIENT_ID}
+    clientSecret: ${LINKEDIN_CLIENT_SECRET}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  health:
+    mail:
+      enabled: false
