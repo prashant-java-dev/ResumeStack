@@ -7,6 +7,7 @@ import java.util.List;
 
 public class ResumeRequest {
 
+    @jakarta.validation.constraints.NotNull(message = "Personal info is required")
     private Resume.PersonalInfo personalInfo;
     private List<Resume.Experience> experience;
     private List<Resume.Education> education;
