@@ -31,9 +31,14 @@ public class ResumeService {
 
         Resume resume = getResumeById(id);
         
+        // Debug Logging
+        System.out.println("Update Resume - ID: " + id);
+        System.out.println("Authenticated User: " + userEmail);
+        System.out.println("Resume Owner: " + resume.getUserEmail());
+
         // Verify resume belongs to the authenticated user
         if (!resume.getUserEmail().equals(userEmail)) {
-            throw new RuntimeException("Unauthorized: You can only update your own resumes");
+            throw new RuntimeException("Unauthorized: You can only update your own resumes. Owner: " + resume.getUserEmail() + ", You: " + userEmail);
         }
 
         // Map fields
