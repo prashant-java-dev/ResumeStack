@@ -91,8 +91,17 @@ export default function App() {
       const resumes = await api.getMyResumes();
       if (resumes && resumes.length > 0) {
         setUserResume(resumes[0]);
+      } else {
+        // If user has no saved resume, but has local work -> Remove ID to force CREATE new
+        setUserResume(prev => {
+          if (prev.id && /^[0-9a-fA-F]{24}$/.test(prev.id)) {
+            // It has a mongo ID but user has no resumes in DB (or new account)
+            // We must strip ID so it creates a new one for THIS user
+            return { ...prev, id: null };
+          }
+          return prev;
+        });
       }
-      // If no resume, create one via save logic or keep default
     } catch (e) {
       console.error("Failed to load resume", e);
     }
