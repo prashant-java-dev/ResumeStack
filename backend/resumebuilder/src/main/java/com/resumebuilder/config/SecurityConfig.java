@@ -21,13 +21,13 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(request -> {
-                var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-                corsConfiguration.setAllowedOriginPatterns(java.util.List.of("*"));
-                corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-                corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
-                corsConfiguration.setExposedHeaders(java.util.List.of("Authorization"));
-                corsConfiguration.setAllowCredentials(true);
-                return corsConfiguration;
+                var config = new org.springframework.web.cors.CorsConfiguration();
+                config.setAllowedOriginPatterns(java.util.List.of("*"));
+                config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                config.setAllowedHeaders(java.util.List.of("*"));
+                config.setExposedHeaders(java.util.List.of("Authorization", "Content-Type", "Accept"));
+                config.setAllowCredentials(true);
+                return config;
             }))
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
