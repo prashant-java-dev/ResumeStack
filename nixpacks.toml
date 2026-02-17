@@ -1,8 +1,9 @@
 [phases.setup]
 nixPkgs = ["jdk17", "maven"]
 
-[build]
-command = "cd backend/resumebuilder && mvn clean package -DskipTests"
+[phases.build]
+dependsOn = ["setup"]
+cmds = ["cd backend/resumebuilder && mvn clean package -DskipTests"]
 
 [start]
 cmd = "java -jar backend/resumebuilder/target/*.jar"
