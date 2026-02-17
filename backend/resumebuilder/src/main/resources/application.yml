@@ -1,3 +1,4 @@
+# Railway deployment config
 server:
   port: ${PORT:8080}
 
