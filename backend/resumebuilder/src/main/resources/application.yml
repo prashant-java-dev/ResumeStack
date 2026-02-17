@@ -6,6 +6,7 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URI}
+      database: resumebuilder
 
   mail:
     host: smtp.gmail.com
