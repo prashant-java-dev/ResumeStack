@@ -5,4 +5,4 @@ nixPkgs = ["jdk17", "maven"]
 cmds = ["cd backend/resumebuilder && chmod +x mvnw && ./mvnw clean package -DskipTests"]
 
 [start]
-cmd = "java -jar backend/resumebuilder/target/*.jar"
+cmd = "java -jar backend/resumebuilder/target/resumebuilder-0.0.1-SNAPSHOT.jar"
