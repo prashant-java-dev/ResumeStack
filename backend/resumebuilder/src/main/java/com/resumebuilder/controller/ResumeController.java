@@ -24,23 +24,35 @@ public class ResumeController {
             @Valid @RequestBody ResumeRequest request,
             Authentication authentication
     ) {
-        String email = authentication.getName();
-        Resume resume = resumeService.createResume(request, email);
-        return ResponseEntity.ok(resume);
+        try {
+            String email = authentication.getName();
+            Resume resume = resumeService.createResume(request, email);
+            return ResponseEntity.ok(resume);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // Get My Resumes
     @GetMapping
     public ResponseEntity<?> getMyResumes(Authentication authentication) {
-        String email = authentication.getName();
-        List<Resume> resumes = resumeService.getMyResumes(email);
-        return ResponseEntity.ok(resumes);
+        try {
+            String email = authentication.getName();
+            List<Resume> resumes = resumeService.getMyResumes(email);
+            return ResponseEntity.ok(resumes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error fetching resumes: " + e.getMessage());
+        }
     }
 
     // Get Resume by ID
     @GetMapping("/{id}")
     public ResponseEntity<?> getResume(@PathVariable String id) {
-        return ResponseEntity.ok(resumeService.getResumeById(id));
+        try {
+            return ResponseEntity.ok(resumeService.getResumeById(id));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 
     // Update Resume
@@ -50,8 +62,18 @@ public class ResumeController {
             @Valid @RequestBody ResumeRequest request,
             Authentication authentication
     ) {
-        String email = authentication.getName();
-        return ResponseEntity.ok(resumeService.updateResume(id, request, email));
+        try {
+            String email = authentication.getName();
+            return ResponseEntity.ok(resumeService.updateResume(id, request, email));
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("Unauthorized")) {
+                return ResponseEntity.status(403).body(e.getMessage());
+            }
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(404).body(e.getMessage());
+            }
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // Delete Resume
@@ -60,8 +82,18 @@ public class ResumeController {
             @PathVariable String id,
             Authentication authentication
     ) {
-        String email = authentication.getName();
-        resumeService.deleteResume(id, email);
-        return ResponseEntity.ok("Resume deleted successfully");
+        try {
+            String email = authentication.getName();
+            resumeService.deleteResume(id, email);
+            return ResponseEntity.ok("Resume deleted successfully");
+        } catch (RuntimeException e) {
+             if (e.getMessage().contains("Unauthorized")) {
+                return ResponseEntity.status(403).body(e.getMessage());
+            }
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.status(404).body(e.getMessage());
+            }
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
