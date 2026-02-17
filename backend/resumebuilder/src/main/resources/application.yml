@@ -36,5 +36,6 @@ management:
       exposure:
         include: health, info
   health:
+    show-details: always
     mail:
       enabled: false
