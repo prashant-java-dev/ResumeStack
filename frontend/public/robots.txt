@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://resumestack-ps.netlify.app/sitemap.xml

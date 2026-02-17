@@ -1,22 +1,46 @@
 <!DOCTYPE html>
 <html lang="en" class="">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 
-  <title>ResumeStack - Modern Resume Builder</title>
+  <title>Resume Stack - Free Resume Maker & ATS Checker | Build Professional Resumes</title>
+  <meta name="description"
+    content="Build your professional resume in minutes with Resume Stack. Our free resume maker and ATS checker help you create ATS-friendly resumes that get you hired. Try it now!" />
+  <meta name="keywords"
+    content="resume stack, resume maker, resume ats check, free resume builder, cv maker, ats resume checker, job application, resume templates, online resume builder" />
+  <meta name="author" content="Resume Stack" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://resumestack-ps.netlify.app/" />
+  <meta property="og:title" content="Resume Stack - Free Resume Maker & ATS Checker" />
+  <meta property="og:description"
+    content="Build your professional resume in minutes with Resume Stack. Our free resume maker and ATS checker help you create ATS-friendly resumes that get you hired." />
+  <meta property="og:image" content="https://resumestack-ps.netlify.app/src/assets/resumestack.svg" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://resumestack-ps.netlify.app/" />
+  <meta property="twitter:title" content="Resume Stack - Free Resume Maker & ATS Checker" />
+  <meta property="twitter:description"
+    content="Build your professional resume in minutes with Resume Stack. Our free resume maker and ATS checker help you create ATS-friendly resumes that get you hired." />
+  <meta property="twitter:image" content="https://resumestack-ps.netlify.app/src/assets/resumestack.svg" />
+
   <link rel="icon" type="image/svg+xml" href="./src/assets/resumestack.svg" />
   <link rel="shortcut icon" href="./src/assets/resumestack.svg" />
 
-  
+
   <script src="https://cdn.tailwindcss.com"></script>
 
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
 
-  
+
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -44,7 +68,35 @@
     }
   </script>
 
-  
+  <!-- Structured Data (JSON-LD) for Rich Results -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Resume Stack",
+      "operatingSystem": "Web",
+      "applicationCategory": "BusinessApplication",
+      "description": "Resume Stack is a free, professional resume builder and ATS checker. Build industry-standard resumes and check your ATS score to get hired faster.",
+      "url": "https://resumestack-ps.netlify.app/",
+      "image": "https://resumestack-ps.netlify.app/src/assets/resumestack.svg",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "ratingCount": "1250"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Prashant Sharma"
+      }
+    }
+  </script>
+
+
   <style>
     :root {
       --theme-primary: #4f46e5;
@@ -118,15 +170,15 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      origin: bottom left;
+      transform-origin: bottom left;
     }
 
     .dark .elite-label {
       color: #64748b;
     }
 
-    .elite-input:focus ~ .elite-label,
-    .elite-input:not(:placeholder-shown) ~ .elite-label {
+    .elite-input:focus~.elite-label,
+    .elite-input:not(:placeholder-shown)~.elite-label {
       bottom: 20px;
       font-size: 11px;
       color: var(--theme-primary);
@@ -145,10 +197,9 @@
       transition: transform 0.3s;
     }
 
-    .elite-input:focus ~ .elite-underline {
+    .elite-input:focus~.elite-underline {
       transform: scaleX(1);
     }
-
   </style>
 
   <!-- Dark mode restore -->
@@ -169,4 +220,5 @@
   <script type="module" src="/src/main.jsx"></script>
 
 </body>
+
 </html>

@@ -1,10 +1,10 @@
 server:
-  port: ${PORT:8080}
+  port: ${PORT}
 
 spring:
   data:
     mongodb:
-      uri: ${MONGO_URI:mongodb://localhost:27017/resume}
+      uri: ${MONGO_URI}
 
   mail:
     host: smtp.gmail.com
@@ -19,8 +19,8 @@ spring:
             enable: true
 
 jwt:
-  secret: ${JWT_SECRET:THIS_IS_DEFAULT_ChangeMeInProduction}
-  expiration: ${JWT_EXPIRATION:86400000}
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
 
 oauth:
   google:

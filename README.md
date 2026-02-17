@@ -2,6 +2,9 @@
 
 Resume Stack is a professional Resume Builder and ATS (Applicant Tracking System) Checker application. It helps users build industry-standard resumes and check their ATS score to improve their chances of getting hired.
 
+[Live Demo](https://resumestack-ps.netlify.app/)
+
+
 ## Features
 
 ### Frontend (Client Side)
