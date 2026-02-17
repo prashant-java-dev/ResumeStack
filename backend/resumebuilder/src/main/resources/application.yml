@@ -9,8 +9,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${gmailUsername}
-    password: ${gmailPassword}
+    username: ${EMAIL_USER:placeholder@gmail.com}
+    password: ${EMAIL_PASS:placeholderPassword}
     properties:
       mail:
         smtp:
@@ -19,13 +19,13 @@ spring:
             enable: true
 
 jwt:
-  secret: ${JWT_SECRET}
-  expiration: ${JWT_EXPIRATION}
+  secret: ${JWT_SECRET:defaultSecretKeyForDevelopmentOnlyMakeItLongerInProd}
+  expiration: ${JWT_EXPIRATION:86400000}
 
 oauth:
   google:
-    clientId: ${GOOGLE_CLIENT_ID}
-    clientSecret: ${GOOGLE_CLIENT_SECRET}
+    clientId: ${GOOGLE_CLIENT_ID:placeholder}
+    clientSecret: ${GOOGLE_CLIENT_SECRET:placeholder}
 
 
 management:
