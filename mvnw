@@ -1,2 +1,0 @@
-#!/bin/sh
-cd backend/resumebuilder && chmod +x mvnw && ./mvnw " $@\n
