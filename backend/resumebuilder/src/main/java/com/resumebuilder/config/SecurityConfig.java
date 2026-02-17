@@ -22,9 +22,16 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(cors -> cors.configurationSource(request -> {
                 var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
-                corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://localhost:3000", "https://resumestack-ps.netlify.app")); // Frontend URLs
-                corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                corsConfiguration.setAllowedOrigins(java.util.List.of(
+                    "http://localhost:5173", 
+                    "http://127.0.0.1:5173",
+                    "http://localhost:3000", 
+                    "http://127.0.0.1:3000",
+                    "https://resumestack-ps.netlify.app"
+                ));
+                corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                 corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                corsConfiguration.setExposedHeaders(java.util.List.of("Authorization"));
                 corsConfiguration.setAllowCredentials(true);
                 return corsConfiguration;
             }))
