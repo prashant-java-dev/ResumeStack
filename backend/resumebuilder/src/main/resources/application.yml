@@ -26,9 +26,7 @@ oauth:
   google:
     clientId: ${GOOGLE_CLIENT_ID}
     clientSecret: ${GOOGLE_CLIENT_SECRET}
-  linkedin:
-    clientId: ${LINKEDIN_CLIENT_ID}
-    clientSecret: ${LINKEDIN_CLIENT_SECRET}
+
 
 management:
   endpoints:
