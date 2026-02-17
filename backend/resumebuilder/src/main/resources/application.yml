@@ -21,7 +21,7 @@ spring:
             enable: true
 
 jwt:
-  secret: ${JWT_SECRET:defaultSecretKeyForDevelopmentOnlyMakeItLongerInProd}
+  secret: ${JWT_SECRET:ThisIsASuperLongAndStrongSecretKeyForResumeStack2026GeneratedToSatisfyThe256BitRequirement}
   expiration: ${JWT_EXPIRATION:86400000}
 
 oauth:

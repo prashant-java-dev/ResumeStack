@@ -13,7 +13,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:defaultSecretKeyForDevelopmentOnlyMakeItLongerInProd}")
+    @Value("${jwt.secret:ThisIsASuperLongAndStrongSecretKeyForResumeStack2026GeneratedToSatisfyThe256BitRequirement}")
     private String jwtSecret;
 
     @Value("${jwt.expiration:86400000}")
