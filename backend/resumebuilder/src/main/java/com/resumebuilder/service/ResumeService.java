@@ -37,7 +37,7 @@ public class ResumeService {
         System.out.println("Resume Owner: " + resume.getUserEmail());
 
         // Verify resume belongs to the authenticated user
-        if (!resume.getUserEmail().equals(userEmail)) {
+        if (!resume.getUserEmail().equalsIgnoreCase(userEmail)) {
             throw new RuntimeException("Unauthorized: You can only update your own resumes. Owner: " + resume.getUserEmail() + ", You: " + userEmail);
         }
 
