@@ -416,7 +416,17 @@ IMPORTANT:
     const result = parseJsonFromResponse(text);
     console.log("Comprehensive ATS Analysis complete.");
 
-    return result;
+    // Map API response to frontend expected format
+    const mappedResult = {
+      ...result,
+      suggestions: result.keyImprovements || [],
+      checks: (result.forensicChecklist || []).map(item => ({
+        label: item.category,
+        status: item.status.toLowerCase(),
+        feedback: item.feedback
+      }))
+    };
+    return mappedResult;
   });
 
   if (!result) return MOCK_ATS_RESULT;
