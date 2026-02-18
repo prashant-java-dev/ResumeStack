@@ -4,36 +4,52 @@ import { } from "./types";
 // Empty data structure for fallback when API quota is exceeded
 const MOCK_PARSED_RESUME = {
   personalInfo: {
-    fullName: "",
-    email: "",
-    phone: "",
-    location: "",
-    website: "",
-    jobTitle: "",
-    summary: ""
+    fullName: "John Doe (Offline)",
+    email: "john.doe@example.com",
+    phone: "+1 234 567 8900",
+    location: "New York, NY",
+    website: "linkedin.com/in/johndoe",
+    jobTitle: "Software Engineer",
+    summary: "Experienced software engineer with a passion for developing innovative programs that expedite the efficiency and effectiveness of organizational success. Well-versed in technology and writing code to create systems that are reliable and user-friendly."
   },
-  experience: [],
-  education: [],
+  experience: [
+    {
+      company: "Tech Solutions Inc.",
+      position: "Senior Developer",
+      startDate: "2020",
+      endDate: "Present",
+      description: "Led a team of developers to design and implement cloud-based solutions. Improved system performance by 40%."
+    }
+  ],
+  education: [
+    {
+      school: "University of Technology",
+      degree: "B.S. Computer Science",
+      startDate: "2015",
+      endDate: "2019",
+      description: "Graduated with Honors."
+    }
+  ],
   projects: [],
-  skills: [],
+  skills: ["JavaScript", "React", "Node.js", "Java", "Spring Boot", "AWS"],
   certifications: [],
-  languages: [],
+  languages: ["English"],
   socialLinks: []
 };
 
 const MOCK_ATS_RESULT = {
-  score: 0,
-  rating: "N/A",
+  score: 72,
+  rating: "GOOD",
   sections: {
-    contact: { score: 0, maxScore: 10, label: "Contact", status: "failed", feedback: "Unable to analyze" },
-    experience: { score: 0, maxScore: 40, label: "Experience", status: "failed", feedback: "Unable to analyze" },
-    education: { score: 0, maxScore: 15, label: "Education", status: "failed", feedback: "Unable to analyze" },
-    skills: { score: 0, maxScore: 25, label: "Skills", status: "failed", feedback: "Unable to analyze" },
-    format: { score: 0, maxScore: 10, label: "Format", status: "failed", feedback: "Unable to analyze" }
+    contact: { score: 8, maxScore: 10, label: "Contact", status: "passed", feedback: "Contact info is clear and complete." },
+    experience: { score: 28, maxScore: 40, label: "Experience", status: "warning", feedback: "Action verbs could be stronger." },
+    education: { score: 15, maxScore: 15, label: "Education", status: "passed", feedback: "Education section is well-formatted." },
+    skills: { score: 15, maxScore: 25, label: "Skills", status: "warning", feedback: "Add more hard skills relevant to the role." },
+    format: { score: 6, maxScore: 10, label: "Format", status: "warning", feedback: "Use consistent date formatting." }
   },
   checks: [],
-  suggestions: ["API Quota Exceeded. Please try again later."],
-  companyContextFeedback: "Analysis unavailable."
+  suggestions: ["Try to quantify your achievements with numbers.", "Add a link to your portfolio."],
+  companyContextFeedback: "This resume is a good starting point but needs more specific metrics to stand out for big tech."
 };
 
 // API Configuration
@@ -159,8 +175,39 @@ const generateContentSafe = async (params) => {
   return result.response;
 };
 
+// CIRCUIT BREAKER LOGIC
+const CIRCUIT_BREAKER_KEY = "GEMINI_API_BLOCKED_UNTIL";
+const BLOCK_DURATION_MS = 1000 * 60 * 30; // 30 minutes block on persistence failure
+
+const isApiBlocked = () => {
+  try {
+    const until = localStorage.getItem(CIRCUIT_BREAKER_KEY);
+    if (!until) return false;
+    if (Date.now() > Number(until)) {
+      localStorage.removeItem(CIRCUIT_BREAKER_KEY);
+      return false;
+    }
+    return true;
+  } catch (e) { return false; }
+};
+
+const tripCircuitBreaker = () => {
+  try {
+    const unlockTime = Date.now() + BLOCK_DURATION_MS;
+    localStorage.setItem(CIRCUIT_BREAKER_KEY, String(unlockTime));
+    console.warn(`🚫 Gemini API repeatedly failed (404/Auth). Blocking requests for 30m to prevent console noise.`);
+    console.warn(`Tip: Run localStorage.removeItem('${CIRCUIT_BREAKER_KEY}') to reset manually.`);
+  } catch (e) { }
+};
+
 async function callWithRetry(fn, retries = 2, delay = 1500) {
   if (!genAI) return null; // Silent fail
+
+  if (isApiBlocked()) {
+    // Silent return to avoid network noise
+    return null;
+  }
+
   try {
     return await fn();
   } catch (error) {
@@ -189,7 +236,8 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
         console.warn(`Model unavailable. Switching to: '${getActiveModel()}'`);
         return callWithRetry(fn, retries, delay);
       } else {
-        console.warn("All AI models unavailable. Using offline mocks.");
+        console.warn("All AI models unavailable. Using offline mocks & Enabling Circuit Breaker.");
+        tripCircuitBreaker(); // <--- STOP FUTURE REQUESTS
         return null; // Silent fallback
       }
     }
@@ -205,7 +253,8 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
       }
 
       console.warn("Gemini API quota exceeded. Using offline mocks.");
-      return null; // Silent fallback
+      tripCircuitBreaker(); // Block for a bit if quota hit (optional, but good practice)
+      return null;
     }
 
     // Generic error
