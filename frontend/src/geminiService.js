@@ -1,27 +1,56 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { } from "./types";
 
-// Empty data structure for fallback when API quota is exceeded
+// Fallback data when API is unavailable (Network/Quota/404)
 const MOCK_PARSED_RESUME = {
   personalInfo: {
-    fullName: "", email: "", phone: "", location: "", website: "", jobTitle: "", summary: ""
+    fullName: "API Unavailable (Offline Mode)",
+    email: "server-error@google-api.com",
+    phone: "000-000-0000",
+    location: "Offline",
+    website: "",
+    jobTitle: "Manual Entry Required",
+    summary: "The Google Gemini API is currently unavailable (404/Quota). Please fill your details manually or check your API Key configuration."
   },
-  experience: [], education: [], projects: [], skills: [], certifications: [], languages: [], socialLinks: []
+  experience: [
+    {
+      company: "Example Corp",
+      position: "Role Position",
+      startDate: "2020",
+      endDate: "Present",
+      description: "API connections failed. Please enter your work history manually.",
+      current: true
+    }
+  ],
+  education: [
+    {
+      school: "University of Example",
+      degree: "Bachelor's Degree",
+      startDate: "2016",
+      endDate: "2020",
+      description: "Manual entry required."
+    }
+  ],
+  projects: [],
+  skills: ["Manual Input Needed"],
+  certifications: [],
+  languages: [],
+  socialLinks: []
 };
 
 const MOCK_ATS_RESULT = {
-  score: 0,
-  rating: "N/A",
+  score: 10,
+  rating: "POOR",
   sections: {
-    contact: { score: 0, maxScore: 10, label: "Contact", status: "failed", feedback: "Unable to analyze" },
+    contact: { score: 2, maxScore: 10, label: "Contact", status: "failed", feedback: "Unable to analyze (API Error)" },
     experience: { score: 0, maxScore: 40, label: "Experience", status: "failed", feedback: "Unable to analyze" },
     education: { score: 0, maxScore: 15, label: "Education", status: "failed", feedback: "Unable to analyze" },
     skills: { score: 0, maxScore: 25, label: "Skills", status: "failed", feedback: "Unable to analyze" },
     format: { score: 0, maxScore: 10, label: "Format", status: "failed", feedback: "Unable to analyze" }
   },
   checks: [],
-  suggestions: ["API Quota Exceeded/Unavailable."],
-  companyContextFeedback: "Analysis unavailable."
+  suggestions: ["Google Gemini API is unavailable.", "Check your API Key.", "Check your Network/VPN."],
+  companyContextFeedback: "Analysis unavailable due to network/API error."
 };
 
 // API Configuration
@@ -30,8 +59,7 @@ const normalizeModelName = (modelName) => {
   return modelName.trim().replace(/^models\//, "");
 };
 
-// ROBUST MODEL FALLBACK SYSTEM (Revised for user request)
-// Added more Flash variants to maximize hit rate
+// ROBUST MODEL FALLBACK SYSTEM
 const FALLBACK_MODELS = [
   normalizeModelName(import.meta.env.VITE_GEMINI_MODEL) || "gemini-1.5-flash",
   "gemini-1.5-flash-001",
@@ -118,7 +146,7 @@ const generateContentSafe = async (params) => {
 };
 
 // ------------------------------------------------------------------
-// RETRY LOGIC (Standard, No Circuit Breaker)
+// RETRY LOGIC
 // ------------------------------------------------------------------
 async function callWithRetry(fn, retries = 2, delay = 1500) {
   if (!genAI) return null;
