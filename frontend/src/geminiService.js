@@ -31,73 +31,73 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
 
 // Schemas
 const RESUME_SCHEMA = {
-  type: SchemaType.OBJECT,
+  type: Type.OBJECT,
   properties: {
     personalInfo: {
-      type: SchemaType.OBJECT,
+      type: Type.OBJECT,
       properties: {
-        fullName: { type: SchemaType.STRING },
-        email: { type: SchemaType.STRING },
-        phone: { type: SchemaType.STRING },
-        location: { type: SchemaType.STRING },
-        website: { type: SchemaType.STRING },
-        jobTitle: { type: SchemaType.STRING },
-        summary: { type: SchemaType.STRING }
+        fullName: { type: Type.STRING },
+        email: { type: Type.STRING },
+        phone: { type: Type.STRING },
+        location: { type: Type.STRING },
+        website: { type: Type.STRING },
+        jobTitle: { type: Type.STRING },
+        summary: { type: Type.STRING }
       }
     },
     socialLinks: {
-      type: SchemaType.ARRAY,
+      type: Type.ARRAY,
       items: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
-          platform: { type: SchemaType.STRING },
-          url: { type: SchemaType.STRING }
+          platform: { type: Type.STRING },
+          url: { type: Type.STRING }
         }
       }
     },
     experience: {
-      type: SchemaType.ARRAY,
+      type: Type.ARRAY,
       items: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
-          company: { type: SchemaType.STRING },
-          position: { type: SchemaType.STRING },
-          startDate: { type: SchemaType.STRING },
-          endDate: { type: SchemaType.STRING },
-          description: { type: SchemaType.STRING },
-          current: { type: SchemaType.BOOLEAN }
+          company: { type: Type.STRING },
+          position: { type: Type.STRING },
+          startDate: { type: Type.STRING },
+          endDate: { type: Type.STRING },
+          description: { type: Type.STRING },
+          current: { type: Type.BOOLEAN }
         }
       }
     },
     education: {
-      type: SchemaType.ARRAY,
+      type: Type.ARRAY,
       items: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
-          school: { type: SchemaType.STRING },
-          degree: { type: SchemaType.STRING },
-          startDate: { type: SchemaType.STRING },
-          endDate: { type: SchemaType.STRING },
-          description: { type: SchemaType.STRING }
+          school: { type: Type.STRING },
+          degree: { type: Type.STRING },
+          startDate: { type: Type.STRING },
+          endDate: { type: Type.STRING },
+          description: { type: Type.STRING }
         }
       }
     },
     projects: {
-      type: SchemaType.ARRAY,
+      type: Type.ARRAY,
       items: {
-        type: SchemaType.OBJECT,
+        type: Type.OBJECT,
         properties: {
-          name: { type: SchemaType.STRING },
-          role: { type: SchemaType.STRING },
-          link: { type: SchemaType.STRING },
-          description: { type: SchemaType.STRING },
-          type: { type: SchemaType.STRING, enum: ['Key', 'Personal'] }
+          name: { type: Type.STRING },
+          role: { type: Type.STRING },
+          link: { type: Type.STRING },
+          description: { type: Type.STRING },
+          type: { type: Type.STRING, enum: ['Key', 'Personal'] }
         }
       }
     },
-    certifications: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-    languages: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-    skills: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+    certifications: { type: Type.ARRAY, items: { type: Type.STRING } },
+    languages: { type: Type.ARRAY, items: { type: Type.STRING } },
+    skills: { type: Type.ARRAY, items: { type: Type.STRING } }
   }
 };
 
@@ -147,26 +147,26 @@ export const checkAtsScore = async (data) => {
       config: {
         responseMimeType: 'application/json',
         responseSchema: {
-          type: SchemaType.OBJECT,
+          type: Type.OBJECT,
           properties: {
-            score: { type: SchemaType.INTEGER },
-            rating: { type: SchemaType.STRING },
+            score: { type: Type.INTEGER },
+            rating: { type: Type.STRING },
             sections: {
-              type: SchemaType.OBJECT,
+              type: Type.OBJECT,
               properties: {
-                contact: { type: SchemaType.OBJECT, properties: { score: { type: SchemaType.NUMBER }, maxScore: { type: SchemaType.NUMBER }, label: { type: SchemaType.STRING }, status: { type: SchemaType.STRING }, feedback: { type: SchemaType.STRING } } },
-                experience: { type: SchemaType.OBJECT, properties: { score: { type: SchemaType.NUMBER }, maxScore: { type: SchemaType.NUMBER }, label: { type: SchemaType.STRING }, status: { type: SchemaType.STRING }, feedback: { type: SchemaType.STRING } } },
-                education: { type: SchemaType.OBJECT, properties: { score: { type: SchemaType.NUMBER }, maxScore: { type: SchemaType.NUMBER }, label: { type: SchemaType.STRING }, status: { type: SchemaType.STRING }, feedback: { type: SchemaType.STRING } } },
-                skills: { type: SchemaType.OBJECT, properties: { score: { type: SchemaType.NUMBER }, maxScore: { type: SchemaType.NUMBER }, label: { type: SchemaType.STRING }, status: { type: SchemaType.STRING }, feedback: { type: SchemaType.STRING } } },
-                format: { type: SchemaType.OBJECT, properties: { score: { type: SchemaType.NUMBER }, maxScore: { type: SchemaType.NUMBER }, label: { type: SchemaType.STRING }, status: { type: SchemaType.STRING }, feedback: { type: SchemaType.STRING } } }
+                contact: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, maxScore: { type: Type.NUMBER }, label: { type: Type.STRING }, status: { type: Type.STRING }, feedback: { type: Type.STRING } } },
+                experience: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, maxScore: { type: Type.NUMBER }, label: { type: Type.STRING }, status: { type: Type.STRING }, feedback: { type: Type.STRING } } },
+                education: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, maxScore: { type: Type.NUMBER }, label: { type: Type.STRING }, status: { type: Type.STRING }, feedback: { type: Type.STRING } } },
+                skills: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, maxScore: { type: Type.NUMBER }, label: { type: Type.STRING }, status: { type: Type.STRING }, feedback: { type: Type.STRING } } },
+                format: { type: Type.OBJECT, properties: { score: { type: Type.NUMBER }, maxScore: { type: Type.NUMBER }, label: { type: Type.STRING }, status: { type: Type.STRING }, feedback: { type: Type.STRING } } }
               }
             },
             checks: {
-              type: SchemaType.ARRAY,
-              items: { type: SchemaType.OBJECT, properties: { id: { type: SchemaType.STRING }, label: { type: SchemaType.STRING }, status: { type: SchemaType.STRING, enum: ['passed', 'warning', 'failed'] }, feedback: { type: SchemaType.STRING } } }
+              type: Type.ARRAY,
+              items: { type: Type.OBJECT, properties: { id: { type: Type.STRING }, label: { type: Type.STRING }, status: { type: Type.STRING, enum: ['passed', 'warning', 'failed'] }, feedback: { type: Type.STRING } } }
             },
-            suggestions: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
-            companyContextFeedback: { type: SchemaType.STRING }
+            suggestions: { type: Type.ARRAY, items: { type: Type.STRING } },
+            companyContextFeedback: { type: Type.STRING }
           }
         }
       }
