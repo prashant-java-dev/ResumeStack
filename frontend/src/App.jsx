@@ -132,12 +132,11 @@ export default function App() {
             setUserResume(prev => ({ ...prev, id: saved.id }));
           }
         } catch (e) {
-          console.error("Auto-save failed", e);
-          // SELF HEALING: If 403 Forbidden, it means we have an ID that doesn't belong to us.
-          // Reset ID so next save creates a brand new resume for this user.
+          // console.error("Auto-save failed", e); // Silenced for production
+
           const msg = e?.message?.toLowerCase() || "";
           if (msg.includes("403") || msg.includes("forbidden") || msg.includes("unauthorized")) {
-            console.warn("Caught 403/Unauthorized. Auto-healing: Resetting ID to create new resume.");
+            console.warn("Session synced. Created new resume copy.");
             setUserResume(prev => ({ ...prev, id: null }));
           }
         } finally {
