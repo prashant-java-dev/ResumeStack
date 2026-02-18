@@ -43,7 +43,17 @@ const normalizeModelName = (modelName) => {
   return modelName.trim().replace(/^models\//, "");
 };
 
-const DEFAULT_MODEL = normalizeModelName(import.meta.env.VITE_GEMINI_MODEL) || "gemini-1.5-pro";
+// Models Fallback Strategy
+const MODELS_TO_TRY = [
+  normalizeModelName(import.meta.env.VITE_GEMINI_MODEL),
+  "gemini-1.5-flash",
+  "gemini-1.5-pro",
+  "gemini-pro",
+  "gemini-1.0-pro"
+].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i); // Unique
+
+const DEFAULT_MODEL = MODELS_TO_TRY[0]; // Kept for legacy ref, but main logic uses fallback
+
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 // Initialize AI with API key
@@ -198,7 +208,7 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
 // 1. Resume Parsing Logic
 // ------------------------------------------------------------------
 export const parseResumeFromBinary = async (base64Data, mimeType) => {
-  const result = await callWithRetry(async () => {
+  const result = await callWithFallback(async (model) => {
     if (!base64Data) throw new Error("No file data provided");
 
     console.log("Starting resume parse with Gemini API...");
@@ -224,7 +234,7 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
     };
 
     const response = await ai.models.generateContent({
-      model: DEFAULT_MODEL,
+      model: model,
       contents: [
         {
           parts: [
@@ -305,7 +315,7 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
 // 2. ATS Analysis Logic
 // ------------------------------------------------------------------
 export const checkAtsScore = async (data) => {
-  const result = await callWithRetry(async () => {
+  const result = await callWithFallback(async (model) => {
     console.log("Starting comprehensive ATS analysis...");
 
     // Prepare detailed context
@@ -340,7 +350,7 @@ export const checkAtsScore = async (data) => {
     `;
 
     const response = await ai.models.generateContent({
-      model: DEFAULT_MODEL,
+      model: model,
       contents: `You are an Expert ATS (Applicant Tracking System) Auditor specializing in Big Tech (Google, Meta, Amazon, Microsoft) resume optimization.
 
 Analyze this resume comprehensively and provide a detailed forensic report.
@@ -433,9 +443,9 @@ IMPORTANT:
 // 3. Summary & Cover Letter Gen
 // ------------------------------------------------------------------
 export const optimizeSummary = async (jobTitle, skills) => {
-  return callWithRetry(async () => {
+  return callWithFallback(async (model) => {
     const response = await ai.models.generateContent({
-      model: DEFAULT_MODEL,
+      model: model,
       contents: `Write a powerful professional summary (3-4 sentences) for a ${jobTitle}.
       Keywords to include: ${skills.join(', ')}.
       Tone: Professional, Results-Oriented.`
@@ -445,9 +455,9 @@ export const optimizeSummary = async (jobTitle, skills) => {
 };
 
 export const generateCoverLetter = async (resume, jobTitle, company, desc) => {
-  return callWithRetry(async () => {
+  return callWithFallback(async (model) => {
     const response = await ai.models.generateContent({
-      model: DEFAULT_MODEL,
+      model: model,
       contents: `Write a tailored cover letter for:
       Role: ${jobTitle} at ${company}
       Job Desc: ${desc}
@@ -467,11 +477,11 @@ export const generateCoverLetter = async (resume, jobTitle, company, desc) => {
 // 4. Full Resume Optimization (Auto-Update)
 // ------------------------------------------------------------------
 export const optimizeResumeForAts = async (currentData) => {
-  return callWithRetry(async () => {
+  return callWithFallback(async (model) => {
     console.log("Starting ATS Auto-Optimization...");
 
     const response = await ai.models.generateContent({
-      model: DEFAULT_MODEL,
+      model: model,
       contents: `
       Act as an Expert Resume Writer for Top Tech Companies (Google, Meta, Amazon).
       
