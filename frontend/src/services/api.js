@@ -66,10 +66,7 @@ export const api = {
             headers: getAuthHeaders(),
             body: JSON.stringify(resumeData)
         });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to update resume: ${errorText} (Status: ${response.status})`);
-        }
+        if (!response.ok) throw new Error('Failed to update resume');
         return response.json();
     },
 
