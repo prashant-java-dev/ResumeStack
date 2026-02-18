@@ -1,7 +1,6 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { } from "./types";
 
-
 // Empty data structure for fallback when API quota is exceeded
 const MOCK_PARSED_RESUME = {
   personalInfo: {
@@ -43,16 +42,16 @@ const normalizeModelName = (modelName) => {
   return modelName.trim().replace(/^models\//, "");
 };
 
-// Models Fallback Strategy
-const MODELS_TO_TRY = [
-  normalizeModelName(import.meta.env.VITE_GEMINI_MODEL),
-  "gemini-1.5-flash",
+// ROBUST MODEL FALLBACK SYSTEM
+const FALLBACK_MODELS = [
+  normalizeModelName(import.meta.env.VITE_GEMINI_MODEL) || "gemini-1.5-flash",
   "gemini-1.5-pro",
   "gemini-pro",
   "gemini-1.0-pro"
-].filter(Boolean).filter((v, i, a) => a.indexOf(v) === i); // Unique
+].filter(Boolean);
 
-const DEFAULT_MODEL = MODELS_TO_TRY[0]; // Kept for legacy ref, but main logic uses fallback
+let currentModelIndex = 0;
+const getActiveModel = () => FALLBACK_MODELS[currentModelIndex];
 
 const API_KEY = import.meta.env.VITE_API_KEY;
 
@@ -63,7 +62,7 @@ const ai = (() => {
       console.warn('⚠️ VITE_API_KEY not set. Resume import and ATS features will not work.');
       return null;
     }
-    console.info(`Gemini model configured: ${DEFAULT_MODEL}`);
+    console.info(`Gemini AI Initialized. Active Model: ${getActiveModel()}`);
     return new GoogleGenAI({ apiKey: API_KEY });
   } catch (error) {
     console.error('Failed to initialize Gemini AI:', error);
@@ -142,6 +141,15 @@ const extractRetryDelayMs = (errorMessage) => {
   return 0;
 };
 
+// Helper function to generate content using the current active model
+const generateContentSafe = async (params) => {
+  // Override model in params with current active model
+  return ai.models.generateContent({
+    ...params,
+    model: getActiveModel()
+  });
+};
+
 async function callWithRetry(fn, retries = 2, delay = 1500) {
   if (!ai) throw new Error('Gemini AI not initialized.');
   try {
@@ -155,6 +163,28 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
     if (errorMessage.includes("failed to fetch")) {
       console.error("Network Error Detected: AdBlocker or DNS blocking Google API.");
       throw new Error("Network Error: Please disable AdBlocker (e.g. uBlock) or check internet. Google Gemini API is blocked.");
+    }
+
+    // Check for "Model Not Found" or "Unavailable" to trigger Fallback
+    const isModelUnavailable =
+      errorStatus === 404 ||
+      errorStatus === "404" ||
+      errorMessage.includes("not found") ||
+      errorMessage.includes("unavailable for this api key");
+
+    if (isModelUnavailable) {
+      // Try to switch to next model
+      const failedModel = getActiveModel();
+      const nextIndex = currentModelIndex + 1;
+
+      if (nextIndex < FALLBACK_MODELS.length) {
+        currentModelIndex = nextIndex;
+        console.warn(`⚠️ Model '${failedModel}' unavailable. Switching to fallback: '${getActiveModel()}' and retrying...`);
+        // Recursive retry with same args, but fn will use new model index due to generateContentSafe
+        return callWithRetry(fn, retries, delay);
+      } else {
+        console.error("All fallback models failed."); // No throw here, let generic error handler catch it or throw customized error
+      }
     }
 
     if (isQuotaError(errorMessage, errorStatus)) {
@@ -179,17 +209,6 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
       );
     }
 
-    const isModelNotFound =
-      errorStatus === 404 ||
-      errorStatus === "404" ||
-      (errorMessage.includes("not found") && errorMessage.includes("model"));
-
-    if (isModelNotFound) {
-      throw new Error(
-        `Gemini model "${DEFAULT_MODEL}" is unavailable for this API key. Set VITE_GEMINI_MODEL to a supported model (example: gemini-2.5-flash) and restart the dev server.`
-      );
-    }
-
     console.error("API Call Failed:", error);
     console.error("Error details:", {
       message: error?.message,
@@ -198,8 +217,6 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
       name: error?.name
     });
 
-    // For non-quota errors, provide more helpful message
-    console.error("Non-quota error occurred:", error);
     throw error;
   }
 }
@@ -208,10 +225,10 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
 // 1. Resume Parsing Logic
 // ------------------------------------------------------------------
 export const parseResumeFromBinary = async (base64Data, mimeType) => {
-  const result = await callWithFallback(async (model) => {
+  const result = await callWithRetry(async () => {
     if (!base64Data) throw new Error("No file data provided");
 
-    console.log("Starting resume parse with Gemini API...");
+    console.log(`Starting resume parse with Gemini API (${getActiveModel()})...`);
 
     // User requested structure (internal prompt schema)
     const PROMPT_SCHEMA = {
@@ -233,8 +250,7 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
       languages: []
     };
 
-    const response = await ai.models.generateContent({
-      model: model,
+    const response = await generateContentSafe({
       contents: [
         {
           parts: [
@@ -315,7 +331,7 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
 // 2. ATS Analysis Logic
 // ------------------------------------------------------------------
 export const checkAtsScore = async (data) => {
-  const result = await callWithFallback(async (model) => {
+  const result = await callWithRetry(async () => {
     console.log("Starting comprehensive ATS analysis...");
 
     // Prepare detailed context
@@ -349,8 +365,7 @@ export const checkAtsScore = async (data) => {
     CERTIFICATIONS: ${data.certifications?.length || 0} certifications
     `;
 
-    const response = await ai.models.generateContent({
-      model: model,
+    const response = await generateContentSafe({
       contents: `You are an Expert ATS (Applicant Tracking System) Auditor specializing in Big Tech (Google, Meta, Amazon, Microsoft) resume optimization.
 
 Analyze this resume comprehensively and provide a detailed forensic report.
@@ -443,9 +458,8 @@ IMPORTANT:
 // 3. Summary & Cover Letter Gen
 // ------------------------------------------------------------------
 export const optimizeSummary = async (jobTitle, skills) => {
-  return callWithFallback(async (model) => {
-    const response = await ai.models.generateContent({
-      model: model,
+  return callWithRetry(async () => {
+    const response = await generateContentSafe({
       contents: `Write a powerful professional summary (3-4 sentences) for a ${jobTitle}.
       Keywords to include: ${skills.join(', ')}.
       Tone: Professional, Results-Oriented.`
@@ -455,9 +469,8 @@ export const optimizeSummary = async (jobTitle, skills) => {
 };
 
 export const generateCoverLetter = async (resume, jobTitle, company, desc) => {
-  return callWithFallback(async (model) => {
-    const response = await ai.models.generateContent({
-      model: model,
+  return callWithRetry(async () => {
+    const response = await generateContentSafe({
       contents: `Write a tailored cover letter for:
       Role: ${jobTitle} at ${company}
       Job Desc: ${desc}
@@ -477,11 +490,10 @@ export const generateCoverLetter = async (resume, jobTitle, company, desc) => {
 // 4. Full Resume Optimization (Auto-Update)
 // ------------------------------------------------------------------
 export const optimizeResumeForAts = async (currentData) => {
-  return callWithFallback(async (model) => {
+  return callWithRetry(async () => {
     console.log("Starting ATS Auto-Optimization...");
 
-    const response = await ai.models.generateContent({
-      model: model,
+    const response = await generateContentSafe({
       contents: `
       Act as an Expert Resume Writer for Top Tech Companies (Google, Meta, Amazon).
       
