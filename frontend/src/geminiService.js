@@ -43,8 +43,8 @@ const normalizeModelName = (modelName) => {
   return modelName.trim().replace(/^models\//, "");
 };
 
-const FALLBACK_MODELS = ["gemini-1.5-flash-002", "gemini-1.5-flash-001", "gemini-1.5-pro"];
-const DEFAULT_MODEL = normalizeModelName(import.meta.env.VITE_GEMINI_MODEL) || "gemini-1.5-flash";
+const DEFAULT_MODEL = normalizeModelName(import.meta.env.VITE_GEMINI_MODEL) || "gemini-2.5-flash";
+const API_KEY = import.meta.env.VITE_API_KEY;
 
 // Initialize AI with API key
 const ai = (() => {
@@ -60,29 +60,6 @@ const ai = (() => {
     return null;
   }
 })();
-
-// Helper to get a working model
-const getWorkingModel = async (contentGenerator) => {
-  // Try default first
-  try {
-    return await contentGenerator(DEFAULT_MODEL);
-  } catch (e) {
-    // If 404 (Not Found) or 400 (Bad Request), try fallbacks
-    if (e.message.includes('404') || e.message.includes('not found') || e.message.includes('400')) {
-      console.warn(`Model ${DEFAULT_MODEL} failed, trying fallbacks...`);
-      for (const model of FALLBACK_MODELS) {
-        try {
-          console.log(`Trying fallback model: ${model}`);
-          return await contentGenerator(model);
-        } catch (innerE) {
-          // Continue to next model
-          console.warn(`Fallback ${model} failed.`);
-        }
-      }
-    }
-    throw e; // Rethrow if all fail or if it's not a model error
-  }
-};
 
 // Helper to extract text from response regardless of SDK version
 const getResponseText = (response) => {
@@ -240,34 +217,31 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
       languages: []
     };
 
-    // Use fallback helper
-    const response = await getWorkingModel(async (modelName) => {
-      return await ai.models.generateContent({
-        model: modelName,
-        contents: [
-          {
-            parts: [
-              { inlineData: { data: base64Data, mimeType: mimeType || "application/pdf" } },
-              {
-                text: `SYSTEM: You are an advanced AI Resume Parser.
-                  
-                  TASK: Extract structured resume data from the attached document.
-                  
-                  RULES:
-                  1. **Critically Important**: Extract the candidate's Name, Email, Phone, and LinkedIn URL accurately from the header.
-                  2. **Experience**: Extract each role separately. If a role has multiple projects/bullets, group them under 'responsibilities'. 
-                  3. **Dates**: Normalize all dates to "Month Year" format (e.g., "Jan 2023"). Use "Present" for current roles.
-                  4. **Projects**: Extract project title, description, and technologies used.
-                  5. **Skills**: List all technical skills, tools, and languages.
-                  
-                  RESPONSE FORMAT:
-                  Return ONLY a valid JSON object matching this schema. Do not include markdown formatting like \`\`\`json.
-                  ${JSON.stringify(PROMPT_SCHEMA, null, 2)}`
-              }
-            ]
-          }
-        ]
-      });
+    const response = await ai.models.generateContent({
+      model: DEFAULT_MODEL,
+      contents: [
+        {
+          parts: [
+            { inlineData: { data: base64Data, mimeType: mimeType || "application/pdf" } },
+            {
+              text: `SYSTEM: You are an advanced AI Resume Parser.
+              
+              TASK: Extract structured resume data from the attached document.
+              
+              RULES:
+              1. **Critically Important**: Extract the candidate's Name, Email, Phone, and LinkedIn URL accurately from the header.
+              2. **Experience**: Extract each role separately. If a role has multiple projects/bullets, group them under 'responsibilities'. 
+              3. **Dates**: Normalize all dates to "Month Year" format (e.g., "Jan 2023"). Use "Present" for current roles.
+              4. **Projects**: Extract project title, description, and technologies used.
+              5. **Skills**: List all technical skills, tools, and languages.
+              
+              RESPONSE FORMAT:
+              Return ONLY a valid JSON object matching this schema. Do not include markdown formatting like \`\`\`json.
+              ${JSON.stringify(PROMPT_SCHEMA, null, 2)}`
+            }
+          ]
+        }
+      ]
     });
 
     const text = getResponseText(response);
@@ -328,8 +302,6 @@ export const checkAtsScore = async (data) => {
   const result = await callWithRetry(async () => {
     console.log("Starting comprehensive ATS analysis...");
 
-    // ... (context preparation remains same, just need to wrap the generateContent call)
-
     // Prepare detailed context
     const resumeText = `
     CONTACT: 
@@ -361,8 +333,10 @@ export const checkAtsScore = async (data) => {
     CERTIFICATIONS: ${data.certifications?.length || 0} certifications
     `;
 
-    const systemInstruction = `You are an Expert ATS (Applicant Tracking System) Auditor specializing in Big Tech (Google, Meta, Amazon, Microsoft) resume optimization.
-    
+    const response = await ai.models.generateContent({
+      model: DEFAULT_MODEL,
+      contents: `You are an Expert ATS (Applicant Tracking System) Auditor specializing in Big Tech (Google, Meta, Amazon, Microsoft) resume optimization.
+
 Analyze this resume comprehensively and provide a detailed forensic report.
 
 Resume Data:
@@ -435,14 +409,7 @@ IMPORTANT:
 - Mark as "Warning" if acceptable but could be improved
 - Mark as "Failed" if critical issues exist
 - Provide at least 3-5 keyImprovements
-- Provide 5-7 forensicChecklist items covering all major sections`;
-
-    // Use fallback helper
-    const response = await getWorkingModel(async (modelName) => {
-      return await ai.models.generateContent({
-        model: modelName,
-        contents: systemInstruction
-      });
+- Provide 5-7 forensicChecklist items covering all major sections`
     });
 
     const text = getResponseText(response);
