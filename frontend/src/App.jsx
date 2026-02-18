@@ -135,8 +135,9 @@ export default function App() {
           console.error("Auto-save failed", e);
           // SELF HEALING: If 403 Forbidden, it means we have an ID that doesn't belong to us.
           // Reset ID so next save creates a brand new resume for this user.
-          if (e.message && (e.message.includes("403") || e.message.includes("Forbidden"))) {
-            console.warn("Caught 403 Forbidden. Resetting ID to create new resume for current user.");
+          const msg = e?.message?.toLowerCase() || "";
+          if (msg.includes("403") || msg.includes("forbidden") || msg.includes("unauthorized")) {
+            console.warn("Caught 403/Unauthorized. Auto-healing: Resetting ID to create new resume.");
             setUserResume(prev => ({ ...prev, id: null }));
           }
         } finally {
