@@ -1,4 +1,4 @@
-import { GoogleGenAI, SchemaType } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 
 // Initialize AI
 const API_KEY = import.meta.env.VITE_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || process.env.API_KEY;
