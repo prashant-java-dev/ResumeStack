@@ -61,13 +61,26 @@ export const api = {
     },
 
     updateResume: async (id, resumeData) => {
-        const response = await fetch(`${API_BASE_URL}/resumes/${id}`, {
-            method: 'PUT',
-            headers: getAuthHeaders(),
-            body: JSON.stringify(resumeData)
-        });
-        if (!response.ok) throw new Error('Failed to update resume');
-        return response.json();
+        try {
+            const response = await fetch(`${API_BASE_URL}/resumes/${id}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(resumeData)
+            });
+
+            if (response.status === 403) {
+                // If Forbidden (ID belongs to another user), try creating as NEW instead
+                console.warn("403 Forbidden on update. Attempting to create new resume...");
+                const newData = { ...resumeData, id: null }; // Remove ID
+                return api.createResume(newData);
+            }
+
+            if (!response.ok) throw new Error('Failed to update resume');
+            return response.json();
+        } catch (err) {
+            console.error('Update failed:', err);
+            throw err;
+        }
     },
 
     getMyResumes: async () => {
