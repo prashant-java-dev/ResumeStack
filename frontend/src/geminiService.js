@@ -141,6 +141,12 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
     const errorMessage = rawErrorMessage.toLowerCase();
     const errorStatus = error?.status || error?.code;
 
+    // Check for Network/DNS/AdBlocker errors
+    if (errorMessage.includes("failed to fetch")) {
+      console.error("Network Error Detected: AdBlocker or DNS blocking Google API.");
+      throw new Error("Network Error: Please disable AdBlocker (e.g. uBlock) or check internet. Google Gemini API is blocked.");
+    }
+
     if (isQuotaError(errorMessage, errorStatus)) {
       const dailyQuotaHit = isDailyQuotaLimit(errorMessage);
       const providerSuggestedDelay = extractRetryDelayMs(rawErrorMessage);
