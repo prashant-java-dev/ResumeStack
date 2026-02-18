@@ -146,9 +146,14 @@ const generateContentSafe = async (params) => {
   // Get the model instance for the active model
   const model = genAI.getGenerativeModel({ model: getActiveModel() });
 
+  // Check if params has 'contents' as string (legacy usage), simplify for Standard SDK
+  let request = params;
+  if (params && params.contents && typeof params.contents === 'string') {
+    request = params.contents;
+  }
+
   // Generate content
-  // params usually contains { contents: [...] } matching the SDK input format
-  const result = await model.generateContent(params);
+  const result = await model.generateContent(request);
 
   // Return the response object (which has candidates, text(), etc.)
   return result.response;
@@ -234,77 +239,70 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
       ],
       certifications: [],
       languages: []
-    ],
-// The previous schema logic continues...
-// Re-writing simplified schema definition for brevity
-personalInfo: { fullName: "", email: "", phone: "", location: "", linkedin: "", portfolio: "" },
-summary: "", skills: [], experience: [{ jobTitle: "", company: "", location: "", startDate: "", endDate: "", responsibilities: [] }],
-  education: [{ degree: "", institution: "", startYear: "", endYear: "" }],
-    projects: [{ title: "", description: "", technologies: [] }], certifications: [], languages: []
     };
 
-const response = await generateContentSafe({
-  contents: [
-    {
-      parts: [
-        { inlineData: { data: base64Data, mimeType: mimeType || "application/pdf" } },
+    const response = await generateContentSafe({
+      contents: [
         {
-          text: `SYSTEM: You are an advanced AI Resume Parser.
+          parts: [
+            { inlineData: { data: base64Data, mimeType: mimeType || "application/pdf" } },
+            {
+              text: `SYSTEM: You are an advanced AI Resume Parser.
               TASK: Extract structured resume data.
               RESPONSE FORMAT: JSON ONLY matching schema: ${JSON.stringify(PROMPT_SCHEMA)}`
+            }
+          ]
         }
       ]
-    }
-  ]
-});
+    });
 
-const text = getResponseText(response);
-const parsedData = parseJsonFromResponse(text);
+    const text = getResponseText(response);
+    const parsedData = parseJsonFromResponse(text);
 
-return {
-  personalInfo: {
-    fullName: parsedData.personalInfo?.fullName || "",
-    email: parsedData.personalInfo?.email || "",
-    phone: parsedData.personalInfo?.phone || "",
-    location: parsedData.personalInfo?.location || "",
-    website: parsedData.personalInfo?.linkedin || parsedData.personalInfo?.portfolio || "",
-    jobTitle: parsedData.experience?.[0]?.jobTitle || "",
-    summary: parsedData.summary || ""
-  },
-  experience: (parsedData.experience || []).map(exp => ({
-    company: exp.company || "",
-    position: exp.jobTitle || "",
-    startDate: exp.startDate || "",
-    endDate: exp.endDate || "",
-    description: Array.isArray(exp.responsibilities) ? exp.responsibilities.join('\n• ') : (exp.responsibilities || ""),
-    current: (exp.endDate || "").toLowerCase().includes('present')
-  })),
-  education: (parsedData.education || []).map(edu => ({
-    school: edu.institution || "",
-    degree: edu.degree || "",
-    startDate: edu.startYear || "",
-    endDate: edu.endYear || "",
-    description: ""
-  })),
-  projects: (parsedData.projects || []).map(proj => ({
-    name: proj.title || "",
-    role: "Contributor",
-    link: "",
-    description: `${proj.description || ""} \nTech: ${(proj.technologies || []).join(', ')}`,
-    type: "Key"
-  })),
-  skills: parsedData.skills || [],
-  certifications: parsedData.certifications || [],
-  languages: parsedData.languages || [],
-  socialLinks: [
-    ...(parsedData.personalInfo?.linkedin ? [{ platform: 'LinkedIn', url: parsedData.personalInfo.linkedin }] : []),
-    ...(parsedData.personalInfo?.portfolio ? [{ platform: 'Portfolio', url: parsedData.personalInfo.portfolio }] : [])
-  ]
-};
+    return {
+      personalInfo: {
+        fullName: parsedData.personalInfo?.fullName || "",
+        email: parsedData.personalInfo?.email || "",
+        phone: parsedData.personalInfo?.phone || "",
+        location: parsedData.personalInfo?.location || "",
+        website: parsedData.personalInfo?.linkedin || parsedData.personalInfo?.portfolio || "",
+        jobTitle: parsedData.experience?.[0]?.jobTitle || "",
+        summary: parsedData.summary || ""
+      },
+      experience: (parsedData.experience || []).map(exp => ({
+        company: exp.company || "",
+        position: exp.jobTitle || "",
+        startDate: exp.startDate || "",
+        endDate: exp.endDate || "",
+        description: Array.isArray(exp.responsibilities) ? exp.responsibilities.join('\n• ') : (exp.responsibilities || ""),
+        current: (exp.endDate || "").toLowerCase().includes('present')
+      })),
+      education: (parsedData.education || []).map(edu => ({
+        school: edu.institution || "",
+        degree: edu.degree || "",
+        startDate: edu.startYear || "",
+        endDate: edu.endYear || "",
+        description: ""
+      })),
+      projects: (parsedData.projects || []).map(proj => ({
+        name: proj.title || "",
+        role: "Contributor",
+        link: "",
+        description: `${proj.description || ""} \nTech: ${(proj.technologies || []).join(', ')}`,
+        type: "Key"
+      })),
+      skills: parsedData.skills || [],
+      certifications: parsedData.certifications || [],
+      languages: parsedData.languages || [],
+      socialLinks: [
+        ...(parsedData.personalInfo?.linkedin ? [{ platform: 'LinkedIn', url: parsedData.personalInfo.linkedin }] : []),
+        ...(parsedData.personalInfo?.portfolio ? [{ platform: 'Portfolio', url: parsedData.personalInfo.portfolio }] : [])
+      ]
+    };
   });
 
-if (!result) return MOCK_PARSED_RESUME;
-return result;
+  if (!result) return MOCK_PARSED_RESUME;
+  return result;
 };
 
 // ------------------------------------------------------------------
@@ -312,30 +310,46 @@ return result;
 // ------------------------------------------------------------------
 export const checkAtsScore = async (data) => {
   const result = await callWithRetry(async () => {
-    const resumeText = `NAME: ${data.personalInfo.fullName}, EMAIL: ${data.personalInfo.email}, SKILLS: ${data.skills.join(', ')}`;
+
+    // Prepare detailed context
+    const resumeText = `
+    CONTACT: ${data.personalInfo.fullName || 'Missing'}, ${data.personalInfo.email || 'Missing'}
+    SUMMARY: ${data.personalInfo.summary || 'Missing'}
+    EXPERIENCE: ${JSON.stringify(data.experience.map(e => ({ title: e.position, company: e.company, desc: e.description })))}
+    SKILLS: ${data.skills.join(', ') || 'None listed'}
+    EDUCATION: ${JSON.stringify(data.education.map(e => ({ degree: e.degree, school: e.school })))}
+    `;
 
     const response = await generateContentSafe({
-      contents: `You are an Expert ATS Auditor. Analyze this resume.
-Resume Data: ${resumeText}
+      contents: `You are an Expert ATS Auditor specializing in Big Tech.
+
+Analyze this resume and provide a forensic report.
+
+Resume Data:
+${resumeText}
 
 Return JSON ONLY (no markdown) with this EXACT structure:
 {
-  "score": number (0-100),
-  "rating": string,
-  "sections": { 
-     "contact": { "score": 0, "maxScore": 8, "label": "Contact", "status": "passed", "feedback": "" },
-     "experience": { "score": 0, "maxScore": 38, "label": "Work Experience", "status": "passed", "feedback": "" },
-     "education": { "score": 0, "maxScore": 15, "label": "Education", "status": "passed", "feedback": "" },
-     "skills": { "score": 0, "maxScore": 23, "label": "Skills", "status": "passed", "feedback": "" },
-     "format": { "score": 0, "maxScore": 9, "label": "Format", "status": "passed", "feedback": "" },
-     "summary": { "score": 0, "maxScore": 7, "label": "Summary", "status": "passed", "feedback": "" }
+  "score": number (0-100, total ATS score),
+  "rating": string ("POOR"|"AVERAGE"|"GOOD"|"EXCELLENT"),
+  "sections": {
+    "contact": { "score": 0, "maxScore": 8, "label": "Contact", "status": "passed", "feedback": "string" },
+    "experience": { "score": 0, "maxScore": 38, "label": "Experience", "status": "passed", "feedback": "string" },
+    "education": { "score": 0, "maxScore": 15, "label": "Education", "status": "passed", "feedback": "string" },
+    "skills": { "score": 0, "maxScore": 23, "label": "Skills", "status": "passed", "feedback": "string" },
+    "format": { "score": 0, "maxScore": 9, "label": "Format", "status": "passed", "feedback": "string" },
+    "summary": { "score": 0, "maxScore": 7, "label": "Summary", "status": "passed", "feedback": "string" }
   },
-  "keyImprovements": [],
-  "companyContextFeedback": ""
+  "forensicChecklist": [
+    { "category": "string", "status": "Passed|Warning|Failed", "feedback": "string" }
+  ],
+  "keyImprovements": ["string"],
+  "companyContextFeedback": "string"
 }`
     });
 
     const text = getResponseText(response);
+    // Parse result
     return parseJsonFromResponse(text);
   });
 
@@ -349,7 +363,9 @@ Return JSON ONLY (no markdown) with this EXACT structure:
 export const optimizeSummary = async (jobTitle, skills) => {
   const result = await callWithRetry(async () => {
     const response = await generateContentSafe({
-      contents: `Write a professional summary for ${jobTitle} with skills ${skills.join(', ')}.`
+      contents: `Write a professional summary (3-4 sentences) for a ${jobTitle}.
+      Keywords to include: ${skills.join(', ')}.
+      Tone: Professional, Results-Oriented.`
     });
     return getResponseText(response).trim();
   });
@@ -359,7 +375,16 @@ export const optimizeSummary = async (jobTitle, skills) => {
 export const generateCoverLetter = async (resume, jobTitle, company, desc) => {
   const result = await callWithRetry(async () => {
     const response = await generateContentSafe({
-      contents: `Write cover letter for ${jobTitle} at ${company}. Candidate: ${resume.personalInfo.fullName}.`
+      contents: `Write a tailored cover letter for:
+      Role: ${jobTitle} at ${company}
+      Job Desc: ${desc}
+      
+      Using this Candidate Profile:
+      Name: ${resume.personalInfo.fullName}
+      Skills: ${resume.skills.join(', ')}
+      Experience: ${JSON.stringify(resume.experience.slice(0, 2))}
+      
+      Output: Plain text cover letter body only.`
     });
     return getResponseText(response).trim();
   });
@@ -372,8 +397,19 @@ export const generateCoverLetter = async (resume, jobTitle, company, desc) => {
 export const optimizeResumeForAts = async (currentData) => {
   const result = await callWithRetry(async () => {
     const response = await generateContentSafe({
-      contents: `Optimize this resume for ATS. Return JSON. Data: ${JSON.stringify(currentData)}`
+      contents: `
+      Act as an Expert Resume Writer.
+      
+      TASK: Rewrite and optimize this resume data to maximize ATS score.
+      
+      CURRENT DATA:
+      ${JSON.stringify(currentData)}
+      
+      RETURN FORMAT:
+      Return ONLY valid JSON matching the exact structure of the input data.
+      `
     });
+
     const text = getResponseText(response);
     return parseJsonFromResponse(text);
   });
