@@ -4,52 +4,24 @@ import { } from "./types";
 // Empty data structure for fallback when API quota is exceeded
 const MOCK_PARSED_RESUME = {
   personalInfo: {
-    fullName: "John Doe (Offline)",
-    email: "john.doe@example.com",
-    phone: "+1 234 567 8900",
-    location: "New York, NY",
-    website: "linkedin.com/in/johndoe",
-    jobTitle: "Software Engineer",
-    summary: "Experienced software engineer with a passion for developing innovative programs that expedite the efficiency and effectiveness of organizational success. Well-versed in technology and writing code to create systems that are reliable and user-friendly."
+    fullName: "", email: "", phone: "", location: "", website: "", jobTitle: "", summary: ""
   },
-  experience: [
-    {
-      company: "Tech Solutions Inc.",
-      position: "Senior Developer",
-      startDate: "2020",
-      endDate: "Present",
-      description: "Led a team of developers to design and implement cloud-based solutions. Improved system performance by 40%."
-    }
-  ],
-  education: [
-    {
-      school: "University of Technology",
-      degree: "B.S. Computer Science",
-      startDate: "2015",
-      endDate: "2019",
-      description: "Graduated with Honors."
-    }
-  ],
-  projects: [],
-  skills: ["JavaScript", "React", "Node.js", "Java", "Spring Boot", "AWS"],
-  certifications: [],
-  languages: ["English"],
-  socialLinks: []
+  experience: [], education: [], projects: [], skills: [], certifications: [], languages: [], socialLinks: []
 };
 
 const MOCK_ATS_RESULT = {
-  score: 72,
-  rating: "GOOD",
+  score: 0,
+  rating: "N/A",
   sections: {
-    contact: { score: 8, maxScore: 10, label: "Contact", status: "passed", feedback: "Contact info is clear and complete." },
-    experience: { score: 28, maxScore: 40, label: "Experience", status: "warning", feedback: "Action verbs could be stronger." },
-    education: { score: 15, maxScore: 15, label: "Education", status: "passed", feedback: "Education section is well-formatted." },
-    skills: { score: 15, maxScore: 25, label: "Skills", status: "warning", feedback: "Add more hard skills relevant to the role." },
-    format: { score: 6, maxScore: 10, label: "Format", status: "warning", feedback: "Use consistent date formatting." }
+    contact: { score: 0, maxScore: 10, label: "Contact", status: "failed", feedback: "Unable to analyze" },
+    experience: { score: 0, maxScore: 40, label: "Experience", status: "failed", feedback: "Unable to analyze" },
+    education: { score: 0, maxScore: 15, label: "Education", status: "failed", feedback: "Unable to analyze" },
+    skills: { score: 0, maxScore: 25, label: "Skills", status: "failed", feedback: "Unable to analyze" },
+    format: { score: 0, maxScore: 10, label: "Format", status: "failed", feedback: "Unable to analyze" }
   },
   checks: [],
-  suggestions: ["Try to quantify your achievements with numbers.", "Add a link to your portfolio."],
-  companyContextFeedback: "This resume is a good starting point but needs more specific metrics to stand out for big tech."
+  suggestions: ["API Quota Exceeded/Unavailable."],
+  companyContextFeedback: "Analysis unavailable."
 };
 
 // API Configuration
@@ -58,12 +30,14 @@ const normalizeModelName = (modelName) => {
   return modelName.trim().replace(/^models\//, "");
 };
 
-// ROBUST MODEL FALLBACK SYSTEM
+// ROBUST MODEL FALLBACK SYSTEM (Revised for user request)
+// Added more Flash variants to maximize hit rate
 const FALLBACK_MODELS = [
   normalizeModelName(import.meta.env.VITE_GEMINI_MODEL) || "gemini-1.5-flash",
+  "gemini-1.5-flash-001",
+  "gemini-1.5-flash-latest",
   "gemini-1.5-pro",
-  "gemini-pro",
-  "gemini-1.0-pro"
+  "gemini-1.5-pro-001"
 ].filter(Boolean);
 
 let currentModelIndex = 0;
@@ -75,10 +49,9 @@ const API_KEY = import.meta.env.VITE_API_KEY;
 const genAI = (() => {
   try {
     if (!API_KEY) {
-      console.warn('⚠️ VITE_API_KEY not set. Resume import and ATS features will not work.');
+      console.warn('⚠️ VITE_API_KEY not set.');
       return null;
     }
-    console.info(`Gemini AI Initialized.`);
     return new GoogleGenerativeAI(API_KEY);
   } catch (error) {
     console.warn('Failed to initialize Gemini AI:', error.message);
@@ -104,24 +77,19 @@ const getResponseText = (response) => {
 // Helper to parse JSON from Markdown code blocks
 const parseJsonFromResponse = (text) => {
   let jsonStr = text.trim();
-
-  // Remove markdown code blocks if present
   if (jsonStr.includes('```json')) {
     jsonStr = jsonStr.split('```json')[1].split('```')[0].trim();
   } else if (jsonStr.includes('```')) {
     jsonStr = jsonStr.split('```')[1].split('```')[0].trim();
   }
-
-  // Try to find JSON object if there's extra text
   const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
   if (jsonMatch) {
     jsonStr = jsonMatch[0];
   }
-
   try {
     return JSON.parse(jsonStr);
   } catch {
-    console.warn("JSON Parsing Failed. Returning empty.");
+    console.warn("JSON Parsing Failed.");
     throw new Error("Failed to parse valid JSON from AI response");
   }
 };
@@ -134,79 +102,26 @@ const isQuotaError = (errorMessage, errorStatus) => {
     errorStatus === 429 ||
     errorStatus === '429' ||
     (msg.includes('quota') && msg.includes('exceeded')) ||
-    msg.includes('rate limit') ||
-    msg.includes('resource_exhausted')
+    msg.includes('rate limit')
   );
-};
-
-const isDailyQuotaLimit = (errorMessage) => {
-  const msg = (errorMessage || '').toLowerCase();
-  return (
-    msg.includes('generaterequestsperday') ||
-    msg.includes('perdayperproject') ||
-    msg.includes('per day')
-  );
-};
-
-const extractRetryDelayMs = (errorMessage) => {
-  const msg = getErrorMessage({ message: errorMessage });
-  const secMatch = msg.match(/retry in\s+([\d.]+)s/i);
-  if (secMatch?.[1]) {
-    return Math.ceil(Number(secMatch[1]) * 1000);
-  }
-  return 0;
 };
 
 // Helper function to generate content using the current active model
 const generateContentSafe = async (params) => {
-  // Get the model instance for the active model
   const model = genAI.getGenerativeModel({ model: getActiveModel() });
-
-  // Check if params has 'contents' as string (legacy usage), simplify for Standard SDK
   let request = params;
   if (params && params.contents && typeof params.contents === 'string') {
     request = params.contents;
   }
-
-  // Generate content
   const result = await model.generateContent(request);
-
-  // Return the response object (which has candidates, text(), etc.)
   return result.response;
 };
 
-// CIRCUIT BREAKER LOGIC
-const CIRCUIT_BREAKER_KEY = "GEMINI_API_BLOCKED_UNTIL";
-const BLOCK_DURATION_MS = 1000 * 60 * 30; // 30 minutes block on persistence failure
-
-const isApiBlocked = () => {
-  try {
-    const until = localStorage.getItem(CIRCUIT_BREAKER_KEY);
-    if (!until) return false;
-    if (Date.now() > Number(until)) {
-      localStorage.removeItem(CIRCUIT_BREAKER_KEY);
-      return false;
-    }
-    return true;
-  } catch (e) { return false; }
-};
-
-const tripCircuitBreaker = () => {
-  try {
-    const unlockTime = Date.now() + BLOCK_DURATION_MS;
-    localStorage.setItem(CIRCUIT_BREAKER_KEY, String(unlockTime));
-    console.warn(`🚫 Gemini API repeatedly failed (404/Auth). Blocking requests for 30m to prevent console noise.`);
-    console.warn(`Tip: Run localStorage.removeItem('${CIRCUIT_BREAKER_KEY}') to reset manually.`);
-  } catch (e) { }
-};
-
+// ------------------------------------------------------------------
+// RETRY LOGIC (Standard, No Circuit Breaker)
+// ------------------------------------------------------------------
 async function callWithRetry(fn, retries = 2, delay = 1500) {
-  if (!genAI) return null; // Silent fail
-
-  if (isApiBlocked()) {
-    // Silent return to avoid network noise
-    return null;
-  }
+  if (!genAI) return null;
 
   try {
     return await fn();
@@ -215,13 +130,11 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
     const errorMessage = rawErrorMessage.toLowerCase();
     const errorStatus = error?.status || error?.code;
 
-    // Silent Network Error Handling
     if (errorMessage.includes("failed to fetch")) {
-      console.warn("Network: Google API blocked (AdBlocker/DNS). Switching to offline mode.");
+      console.warn("Network Error: Google API blocked.");
       return null;
     }
 
-    // Check for "Model Not Found" or "Unavailable" to trigger Fallback
     const isModelUnavailable =
       errorStatus === 404 ||
       errorStatus === "404" ||
@@ -230,36 +143,27 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
 
     if (isModelUnavailable) {
       const nextIndex = currentModelIndex + 1;
-
       if (nextIndex < FALLBACK_MODELS.length) {
         currentModelIndex = nextIndex;
-        console.warn(`Model unavailable. Switching to: '${getActiveModel()}'`);
+        console.warn(`Model '${getActiveModel()}' unavailable. Retrying with backup...`);
         return callWithRetry(fn, retries, delay);
       } else {
-        console.warn("All AI models unavailable. Using offline mocks & Enabling Circuit Breaker.");
-        tripCircuitBreaker(); // <--- STOP FUTURE REQUESTS
-        return null; // Silent fallback
+        console.warn("All available AI models returned 404.");
+        return null;
       }
     }
 
     if (isQuotaError(errorMessage, errorStatus)) {
-      const dailyQuotaHit = isDailyQuotaLimit(errorMessage);
-      const providerSuggestedDelay = extractRetryDelayMs(rawErrorMessage);
-      const retryDelay = Math.max(delay, providerSuggestedDelay || 0);
-
-      if (!dailyQuotaHit && retries > 0) {
-        await new Promise((res) => setTimeout(res, retryDelay));
-        return callWithRetry(fn, retries - 1, Math.min(retryDelay * 2, 60_000));
+      if (retries > 0) {
+        await new Promise((res) => setTimeout(res, delay));
+        return callWithRetry(fn, retries - 1, delay * 2);
       }
-
-      console.warn("Gemini API quota exceeded. Using offline mocks.");
-      tripCircuitBreaker(); // Block for a bit if quota hit (optional, but good practice)
+      console.warn("Gemini API quota exceeded.");
       return null;
     }
 
-    // Generic error
-    console.warn("Gemini API Error (Handled):", error.message);
-    return null; // Silent fallback
+    console.warn("Gemini API Error:", error.message);
+    return null;
   }
 }
 
@@ -270,24 +174,13 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
   const result = await callWithRetry(async () => {
     if (!base64Data) throw new Error("No file data provided");
 
-    // User requested structure (internal prompt schema)
     const PROMPT_SCHEMA = {
-      personalInfo: {
-        fullName: "", email: "", phone: "", location: "", linkedin: "", portfolio: ""
-      },
-      summary: "",
-      skills: [],
-      experience: [
-        { jobTitle: "", company: "", location: "", startDate: "", endDate: "", responsibilities: [] }
-      ],
-      education: [
-        { degree: "", institution: "", startYear: "", endYear: "" }
-      ],
-      projects: [
-        { title: "", description: "", technologies: [] }
-      ],
-      certifications: [],
-      languages: []
+      personalInfo: { fullName: "", email: "", phone: "", location: "", linkedin: "", portfolio: "" },
+      summary: "", skills: [],
+      experience: [{ jobTitle: "", company: "", location: "", startDate: "", endDate: "", responsibilities: [] }],
+      education: [{ degree: "", institution: "", startYear: "", endYear: "" }],
+      projects: [{ title: "", description: "", technologies: [] }],
+      certifications: [], languages: []
     };
 
     const response = await generateContentSafe({
@@ -295,11 +188,7 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
         {
           parts: [
             { inlineData: { data: base64Data, mimeType: mimeType || "application/pdf" } },
-            {
-              text: `SYSTEM: You are an advanced AI Resume Parser.
-              TASK: Extract structured resume data.
-              RESPONSE FORMAT: JSON ONLY matching schema: ${JSON.stringify(PROMPT_SCHEMA)}`
-            }
+            { text: `SYSTEM: You are an advanced AI Resume Parser. TASK: Extract structured resume data. RESPONSE FORMAT: JSON ONLY matching schema: ${JSON.stringify(PROMPT_SCHEMA)}` }
           ]
         }
       ]
@@ -359,46 +248,31 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
 // ------------------------------------------------------------------
 export const checkAtsScore = async (data) => {
   const result = await callWithRetry(async () => {
-
-    // Prepare detailed context
-    const resumeText = `
-    CONTACT: ${data.personalInfo.fullName || 'Missing'}, ${data.personalInfo.email || 'Missing'}
-    SUMMARY: ${data.personalInfo.summary || 'Missing'}
-    EXPERIENCE: ${JSON.stringify(data.experience.map(e => ({ title: e.position, company: e.company, desc: e.description })))}
-    SKILLS: ${data.skills.join(', ') || 'None listed'}
-    EDUCATION: ${JSON.stringify(data.education.map(e => ({ degree: e.degree, school: e.school })))}
-    `;
+    const resumeText = `CONTACT: ${data.personalInfo.fullName || 'Missing'}, ${data.personalInfo.email}\nSUMMARY: ${data.personalInfo.summary}\nEXPERIENCE: ${JSON.stringify(data.experience)}\nSKILLS: ${data.skills.join(', ')}\nEDUCATION: ${JSON.stringify(data.education)}`;
 
     const response = await generateContentSafe({
-      contents: `You are an Expert ATS Auditor specializing in Big Tech.
-
-Analyze this resume and provide a forensic report.
-
-Resume Data:
+      contents: `You are an Expert ATS Auditor. Analyze:
 ${resumeText}
 
-Return JSON ONLY (no markdown) with this EXACT structure:
+Return JSON ONLY (no markdown) with EXACT structure:
 {
-  "score": number (0-100, total ATS score),
-  "rating": string ("POOR"|"AVERAGE"|"GOOD"|"EXCELLENT"),
+  "score": number (0-100),
+  "rating": string,
   "sections": {
-    "contact": { "score": 0, "maxScore": 8, "label": "Contact", "status": "passed", "feedback": "string" },
-    "experience": { "score": 0, "maxScore": 38, "label": "Experience", "status": "passed", "feedback": "string" },
-    "education": { "score": 0, "maxScore": 15, "label": "Education", "status": "passed", "feedback": "string" },
-    "skills": { "score": 0, "maxScore": 23, "label": "Skills", "status": "passed", "feedback": "string" },
-    "format": { "score": 0, "maxScore": 9, "label": "Format", "status": "passed", "feedback": "string" },
-    "summary": { "score": 0, "maxScore": 7, "label": "Summary", "status": "passed", "feedback": "string" }
+    "contact": { "score": 0, "maxScore": 8, "label": "Contact", "status": "passed", "feedback": "" },
+    "experience": { "score": 0, "maxScore": 38, "label": "Experience", "status": "passed", "feedback": "" },
+    "education": { "score": 0, "maxScore": 15, "label": "Education", "status": "passed", "feedback": "" },
+    "skills": { "score": 0, "maxScore": 23, "label": "Skills", "status": "passed", "feedback": "" },
+    "format": { "score": 0, "maxScore": 9, "label": "Format", "status": "passed", "feedback": "" },
+    "summary": { "score": 0, "maxScore": 7, "label": "Summary", "status": "passed", "feedback": "" }
   },
-  "forensicChecklist": [
-    { "category": "string", "status": "Passed|Warning|Failed", "feedback": "string" }
-  ],
-  "keyImprovements": ["string"],
-  "companyContextFeedback": "string"
+  "forensicChecklist": [{ "category": "", "status": "", "feedback": "" }],
+  "keyImprovements": [""],
+  "companyContextFeedback": ""
 }`
     });
 
     const text = getResponseText(response);
-    // Parse result
     return parseJsonFromResponse(text);
   });
 
@@ -412,9 +286,7 @@ Return JSON ONLY (no markdown) with this EXACT structure:
 export const optimizeSummary = async (jobTitle, skills) => {
   const result = await callWithRetry(async () => {
     const response = await generateContentSafe({
-      contents: `Write a professional summary (3-4 sentences) for a ${jobTitle}.
-      Keywords to include: ${skills.join(', ')}.
-      Tone: Professional, Results-Oriented.`
+      contents: `Write professional summary for ${jobTitle} with skills ${skills.join(', ')}.`
     });
     return getResponseText(response).trim();
   });
@@ -424,16 +296,7 @@ export const optimizeSummary = async (jobTitle, skills) => {
 export const generateCoverLetter = async (resume, jobTitle, company, desc) => {
   const result = await callWithRetry(async () => {
     const response = await generateContentSafe({
-      contents: `Write a tailored cover letter for:
-      Role: ${jobTitle} at ${company}
-      Job Desc: ${desc}
-      
-      Using this Candidate Profile:
-      Name: ${resume.personalInfo.fullName}
-      Skills: ${resume.skills.join(', ')}
-      Experience: ${JSON.stringify(resume.experience.slice(0, 2))}
-      
-      Output: Plain text cover letter body only.`
+      contents: `Write cover letter for ${jobTitle} at ${company}. Candidate: ${resume.personalInfo.fullName}.`
     });
     return getResponseText(response).trim();
   });
@@ -446,23 +309,12 @@ export const generateCoverLetter = async (resume, jobTitle, company, desc) => {
 export const optimizeResumeForAts = async (currentData) => {
   const result = await callWithRetry(async () => {
     const response = await generateContentSafe({
-      contents: `
-      Act as an Expert Resume Writer.
-      
-      TASK: Rewrite and optimize this resume data to maximize ATS score.
-      
-      CURRENT DATA:
-      ${JSON.stringify(currentData)}
-      
-      RETURN FORMAT:
-      Return ONLY valid JSON matching the exact structure of the input data.
-      `
+      contents: `Optimize this resume for ATS. Return JSON same structure. Data: ${JSON.stringify(currentData)}`
     });
-
     const text = getResponseText(response);
     return parseJsonFromResponse(text);
   });
 
-  if (!result) return currentData; // Fallback to original
+  if (!result) return currentData;
   return result;
 };
