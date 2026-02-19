@@ -160,6 +160,23 @@
     }
   </style>
 
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            primary: '#4f46e5',
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.5s ease-out forwards',
+          }
+        }
+      }
+    }
+  </script>
+
   <title>Resume Stack by Prashant Sharma | Best AI Resume Builder</title>
   <link rel="canonical" href="https://resumestack-maker.netlify.app/" />
   <meta name="description"
@@ -222,12 +239,12 @@
 
 
   <script>
-    (function () {
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-        document.documentElement.classList.add("dark");
-      }
-    })();
+      (function () {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+          document.documentElement.classList.add("dark");
+        }
+      })();
   </script>
 </head>
 
