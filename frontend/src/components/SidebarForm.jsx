@@ -4,7 +4,7 @@ import ColorPicker from './ColorPicker';
 import ManualResumeImport from './ManualResumeImport';
 import ATSReviewModal from './ATSReviewModal';
 
-const EliteInput = ({ label, value, onChange, placeholder = "", type = "text" }) => (
+const EliteInput = ({ label, value, onChange, placeholder = "", type = "text", autoComplete = "off" }) => (
     <div className="elite-input-container">
         <input
             type={type}
@@ -12,6 +12,7 @@ const EliteInput = ({ label, value, onChange, placeholder = "", type = "text" })
             value={value === null || value === undefined ? '' : value}
             onChange={e => onChange(e.target.value)}
             placeholder=" "
+            autoComplete={autoComplete}
         />
         <label className="elite-label">{label}</label>
         <div className="elite-underline"></div>
@@ -505,11 +506,11 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                     <div className="space-y-10 animate-fade-up">
                         <h3 className="text-xl font-black uppercase tracking-widest mb-8 text-indigo-500 dark:text-indigo-400">Contact</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                            <EliteInput label="Full Name" value={data.personalInfo.fullName} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, fullName: v } }))} />
-                            <EliteInput label="Job Title" value={data.personalInfo.jobTitle} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, jobTitle: v } }))} />
-                            <EliteInput label="Email" value={data.personalInfo.email} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, email: v } }))} />
-                            <EliteInput label="Phone" value={data.personalInfo.phone} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, phone: v } }))} />
-                            <EliteInput label="City" value={data.personalInfo.location} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, location: v } }))} />
+                            <EliteInput label="Full Name" value={data.personalInfo.fullName} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, fullName: v } }))} autoComplete="name" />
+                            <EliteInput label="Job Title" value={data.personalInfo.jobTitle} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, jobTitle: v } }))} autoComplete="organization-title" />
+                            <EliteInput label="Email" value={data.personalInfo.email} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, email: v } }))} autoComplete="email" />
+                            <EliteInput label="Phone" value={data.personalInfo.phone} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, phone: v } }))} autoComplete="tel" />
+                            <EliteInput label="City" value={data.personalInfo.location} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, location: v } }))} autoComplete="address-level2" />
                         </div>
                         <div className="pt-10 border-t border-slate-100 dark:border-slate-800">
                             <div className="flex justify-between items-center mb-4">
