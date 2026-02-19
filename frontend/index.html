@@ -71,34 +71,41 @@
   <style>
     :root {
       --theme-primary: #4f46e5;
-      --glass-bg: rgba(255, 255, 255, 0.75);
-      --glass-border: rgba(255, 255, 255, 0.6);
-      --glass-text: #1e293b;
+      --glass-bg: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(226, 232, 240, 0.8);
+      --glass-text: #0f172a;
+      --body-bg: #f1f5f9;
     }
 
     .dark {
       --glass-bg: rgba(15, 23, 42, 0.85);
       --glass-border: rgba(255, 255, 255, 0.08);
       --glass-text: #f1f5f9;
+      --body-bg: #020617;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
     }
 
     body {
       -webkit-font-smoothing: antialiased;
-      background: #f8fafc;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      background: var(--body-bg);
       min-height: 100vh;
       color: var(--glass-text);
-      transition: background-color 0.5s ease;
-    }
-
-    .dark body {
-      background: #020617;
+      transition: background-color 0.5s ease, color 0.5s ease;
+      margin: 0;
     }
 
     .glass-effect {
       background: var(--glass-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--glass-border);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
     .glass-card {
@@ -106,13 +113,19 @@
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border: 1px solid var(--glass-border);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+    }
+
+    .dark .glass-card {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
     }
 
     /* Elite Material Input Styles */
     .elite-input-container {
       position: relative;
       width: 100%;
-      margin-top: 1.5rem;
+      margin-top: 1.75rem;
+      margin-bottom: 0.5rem;
     }
 
     .elite-input {
@@ -120,18 +133,16 @@
       width: 100%;
       border: none;
       border-bottom: 2px solid #cbd5e1;
-      /* slate-300 */
       padding: 10px 0;
       background-color: transparent;
       outline: none;
-      transition: border-color 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       font-weight: 500;
       color: inherit;
     }
 
     .dark .elite-input {
       border-bottom-color: #334155;
-      /* slate-700 */
     }
 
     .elite-label {
@@ -139,22 +150,20 @@
       top: 10px;
       left: 0;
       color: #94a3b8;
-      /* slate-400 */
-      transition: all 0.3s ease;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.05em;
+      transform-origin: left top;
     }
 
     .elite-input:focus~.elite-label,
     .elite-input:not(:placeholder-shown)~.elite-label {
-      top: -20px;
-      font-size: 11px;
+      transform: translateY(-28px) scale(0.85);
       color: var(--theme-primary);
-      font-weight: 900;
-      transform-origin: left;
+      font-weight: 800;
     }
 
     .elite-underline {
@@ -165,7 +174,7 @@
       width: 100%;
       background-color: var(--theme-primary);
       transform: scaleX(0);
-      transition: transform 0.3s ease;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       transform-origin: center;
     }
 
@@ -182,7 +191,7 @@
     }
 
     ::-webkit-scrollbar {
-      width: 6px;
+      width: 8px;
     }
 
     ::-webkit-scrollbar-track {
@@ -191,11 +200,14 @@
 
     ::-webkit-scrollbar-thumb {
       background: rgba(0, 0, 0, 0.1);
-      border-radius: 10px;
+      border-radius: 20px;
+      border: 2px solid transparent;
+      background-clip: content-box;
     }
 
     .dark ::-webkit-scrollbar-thumb {
       background: rgba(255, 255, 255, 0.1);
+      background-clip: content-box;
     }
 
     @media print {
