@@ -37,6 +37,7 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--glass-border);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
     }
 
     .glass-card {
@@ -44,6 +45,7 @@
       backdrop-filter: blur(24px) saturate(180%);
       -webkit-backdrop-filter: blur(24px) saturate(180%);
       border: 1px solid var(--glass-border);
+      transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
     /* Elite Material Input Styles */
@@ -204,11 +206,13 @@
   </script>
 
 
-  <!-- Dark mode restore -->
   <script>
-    if (localStorage.getItem("theme") === "dark") {
-      document.documentElement.classList.add("dark");
-    }
+    (function () {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme === "dark" || (!savedTheme && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+        document.documentElement.classList.add("dark");
+      }
+    })();
   </script>
 </head>
 

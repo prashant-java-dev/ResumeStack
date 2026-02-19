@@ -7,7 +7,7 @@ const EliteInput = ({ label, value, onChange, placeholder = "", type = "text" })
       className="elite-input"
       value={value}
       onChange={e => onChange(e.target.value)}
-      placeholder={placeholder || label}
+      placeholder=" "
       required
     />
     <label className="elite-label">{label}</label>

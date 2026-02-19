@@ -11,7 +11,7 @@ const EliteInput = ({ label, value, onChange, placeholder = "", type = "text" })
             className="elite-input"
             value={value === null || value === undefined ? '' : value}
             onChange={e => onChange(e.target.value)}
-            placeholder={placeholder || label}
+            placeholder=" "
         />
         <label className="elite-label">{label}</label>
         <div className="elite-underline"></div>
@@ -25,7 +25,7 @@ const EliteTextArea = ({ label, value, onChange, rows = 8 }) => (
             value={value === null || value === undefined ? '' : value}
             onChange={e => onChange(e.target.value)}
             rows={rows}
-            placeholder={label}
+            placeholder=" "
         />
         <label className="elite-label">{label}</label>
         <div className="elite-underline"></div>
@@ -408,7 +408,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                     </button>
                     <button
                         onClick={handleSave}
-                        className={`px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-premium ${saveSuccess ? 'bg-emerald-500 text-white' : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-105 active:scale-95'}`}
+                        className={`px-6 py-3 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all shadow-premium ${saveSuccess ? 'bg-emerald-500 text-white' : 'bg-white text-slate-900 border border-slate-200 dark:bg-slate-800 dark:text-white dark:border-slate-700 hover:scale-105 active:scale-95'}`}
                     >
                         {isSaving ? 'Saving...' : saveSuccess ? '✓ Saved' : 'Save'}
                     </button>
@@ -416,13 +416,13 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                     <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isImporting || quotaExceeded}
-                        className="px-6 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-black text-[10px] uppercase tracking-widest hover:bg-slate-200 transition-all disabled:opacity-50"
+                        className="px-6 py-3 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-900 font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all disabled:opacity-50"
                     >
                         {isImporting ? 'Reading...' : 'Import PDF'}
                     </button>
                     <button
                         onClick={() => setShowManualImport(true)}
-                        className="px-6 py-3 rounded-xl bg-indigo-100 dark:bg-indigo-900 text-indigo-900 dark:text-indigo-100 font-black text-[10px] uppercase tracking-widest hover:bg-indigo-200 dark:hover:bg-indigo-800 transition-all"
+                        className="px-6 py-3 rounded-xl bg-indigo-600 text-white dark:bg-indigo-500 font-black text-[10px] uppercase tracking-widest hover:shadow-lg transition-all"
                     >
                         Manual Input
                     </button>
@@ -494,7 +494,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
             }
             <nav className="flex gap-2 p-2 glass-card rounded-[2rem] overflow-x-auto no-scrollbar">
                 {menuItems.map(item => (
-                    <button key={item.name} onClick={() => setActiveSection(item.name)} className={`flex-1 min-w-[90px] py-4 rounded-2xl transition-all font-black text-[9px] uppercase tracking-widest ${activeSection === item.name ? 'bg-white dark:bg-slate-800 shadow-glass text-slate-900 dark:text-white scale-[1.02]' : 'text-slate-400'}`}>
+                    <button key={item.name} onClick={() => setActiveSection(item.name)} className={`flex-1 min-w-[90px] py-4 rounded-2xl transition-all font-black text-[9px] uppercase tracking-widest ${activeSection === item.name ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xl scale-[1.02]' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}>
                         {item.name}
                     </button>
                 ))}
@@ -503,7 +503,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
             <div className="glass-card p-10 rounded-[3rem] shadow-soft min-h-[500px]">
                 {activeSection === 'My Info' && (
                     <div className="space-y-10 animate-fade-up">
-                        <h3 className="text-xl font-black uppercase tracking-widest mb-8 text-indigo-500">Contact</h3>
+                        <h3 className="text-xl font-black uppercase tracking-widest mb-8 text-indigo-500 dark:text-indigo-400">Contact</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                             <EliteInput label="Full Name" value={data.personalInfo.fullName} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, fullName: v } }))} />
                             <EliteInput label="Job Title" value={data.personalInfo.jobTitle} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, jobTitle: v } }))} />
@@ -525,7 +525,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
 
                 {activeSection === 'Socials' && (
                     <div className="space-y-12 animate-fade-up">
-                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500">Social Presence</h3>
+                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Social Presence</h3>
                         <div className="space-y-10">
                             {data.socialLinks.map(link => (
                                 <div key={link.id} className="relative group border-b border-slate-50 dark:border-slate-900 pb-10 last:border-0">
@@ -545,7 +545,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
 
                 {activeSection === 'Work' && (
                     <div className="space-y-12 animate-fade-up">
-                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500">Work History</h3>
+                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Work History</h3>
                         <div className="space-y-16">
                             {data.experience.map(exp => (
                                 <div key={exp.id} className="relative group border-b border-slate-50 dark:border-slate-900 pb-12 last:border-0">
@@ -568,7 +568,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
 
                 {activeSection === 'Projects' && (
                     <div className="space-y-12 animate-fade-up">
-                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500">Projects</h3>
+                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Projects</h3>
                         <div className="space-y-16">
                             {data.projects.map(proj => (
                                 <div key={proj.id} className="relative group border-b border-slate-50 dark:border-slate-900 pb-12 last:border-0">
@@ -591,7 +591,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
 
                 {activeSection === 'School' && (
                     <div className="space-y-12 animate-fade-up">
-                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500">Education</h3>
+                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Education</h3>
                         <div className="space-y-16">
                             {data.education.map(edu => (
                                 <div key={edu.id} className="relative group">
@@ -614,7 +614,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
 
                 {activeSection === 'Skills' && (
                     <div className="space-y-12 animate-fade-up">
-                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500">Skills & Extras</h3>
+                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Skills & Extras</h3>
 
                         <div className="space-y-8">
                             <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Skills</label>
@@ -665,7 +665,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
 
                 {activeSection === 'Cover Letter' && (
                     <div className="space-y-10 animate-fade-up">
-                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500">Generate Cover Letter</h3>
+                        <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Generate Cover Letter</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                             <EliteInput label="Target Job Title" value={jobTitleForCL} onChange={setJobTitleForCL} />
                             <EliteInput label="Company Name" value={companyNameForCL} onChange={setCompanyNameForCL} />

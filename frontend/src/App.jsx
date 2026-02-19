@@ -56,8 +56,23 @@ export default function App() {
       loadLocalResume();
     }
 
-    const savedTheme = localStorage.getItem('app_theme');
-    if (savedTheme === 'dark') setIsDarkMode(true);
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      if (savedTheme === 'dark') setIsDarkMode(true);
+      else setIsDarkMode(false);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setIsDarkMode(true);
+    }
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleSystemChange = (e) => {
+      if (!localStorage.getItem('theme')) {
+        setIsDarkMode(e.matches);
+      }
+    };
+    mediaQuery.addEventListener('change', handleSystemChange);
+    return () => mediaQuery.removeEventListener('change', handleSystemChange);
 
   }, []);
 
@@ -153,7 +168,7 @@ export default function App() {
       document.documentElement.classList.remove('dark');
     }
 
-    localStorage.setItem('app_theme', isDarkMode ? 'dark' : 'light');
+    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
 
   }, [isDarkMode]);
 
