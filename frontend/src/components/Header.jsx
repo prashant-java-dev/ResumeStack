@@ -9,7 +9,7 @@ export default function Header({ view, setView, theme, toggleTheme, isAuthentica
           className="text-2xl font-black flex items-center gap-3 group text-slate-900 dark:text-white"
         >
           {/* Logo with SVG */}
-          <div className="w-10 h-10 rounded-2xl flex items-center justify-center text-white dark:text-slate-900 shadow-xl group-hover:scale-110 transition-transform bg-gradient-to-br from-indigo-600 to-violet-600 dark:from-white dark:to-white">
+          <div className="w-10 h-10 bg-slate-900 dark:bg-white rounded-2xl flex items-center justify-center text-white dark:text-slate-900 shadow-xl group-hover:scale-110 transition-transform">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
