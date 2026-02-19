@@ -395,7 +395,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
             {/* Editor Header */}
             <div className="glass-card p-6 rounded-[2.5rem] flex flex-wrap justify-between items-center shadow-soft gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black bg-gradient-to-br from-indigo-600 to-violet-600" style={data.themeColor.includes('gradient') ? { background: data.themeColor } : {}}>R</div>
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black" style={{ background: data.themeColor || '#4f46e5' }}>R</div>
                     <h2 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">Editor</h2>
                 </div>
                 <div className="flex gap-2 flex-wrap justify-end">
