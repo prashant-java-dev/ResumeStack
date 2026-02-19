@@ -32,41 +32,11 @@
   <link rel="shortcut icon" href="./src/assets/resumestack.svg" />
 
 
-  <script src="https://cdn.tailwindcss.com"></script>
-
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
     rel="stylesheet">
 
-
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          boxShadow: {
-            glass: '0 8px 32px 0 rgba(31, 38, 135, 0.07)',
-            soft: '0 20px 60px -15px rgba(0, 0, 0, 0.05)',
-            premium: '0 10px 40px -10px rgba(0, 0, 0, 0.08)',
-          },
-          animation: {
-            'fade-up': 'fadeUp 0.5s ease-out forwards',
-          },
-          keyframes: {
-            fadeUp: {
-              '0%': { opacity: '0', transform: 'translateY(10px)' },
-              '100%': { opacity: '1', transform: 'translateY(0)' },
-            }
-          }
-        }
-      }
-    }
-  </script>
 
   <!-- Structured Data (JSON-LD) for Rich Results -->
   <script type="application/ld+json">
@@ -97,119 +67,12 @@
   </script>
 
 
-  <style>
-    :root {
-      --theme-primary: #4f46e5;
-      --glass-bg: rgba(255, 255, 255, 0.75);
-      --glass-border: rgba(255, 255, 255, 0.6);
-      --glass-text: #1e293b;
-    }
-
-    .dark {
-      --glass-bg: rgba(15, 23, 42, 0.85);
-      --glass-border: rgba(255, 255, 255, 0.08);
-      --glass-text: #f1f5f9;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      background: #f8fafc;
-      color: var(--glass-text);
-      transition: background-color 0.5s ease;
-      min-height: 100vh;
-    }
-
-    .dark body {
-      background: #020617;
-    }
-
-    .glass-card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(24px);
-      border: 1px solid var(--glass-border);
-    }
-
-    /* Elite Input */
-    .elite-input-container {
-      position: relative;
-      width: 100%;
-      margin-top: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .elite-input {
-      width: 100%;
-      border: none;
-      border-bottom: 2px solid #cbd5e1;
-      padding: 12px 0 8px 0;
-      background: transparent;
-      outline: none;
-      font-weight: 500;
-      color: inherit;
-      font-size: 16px;
-      transition: border-color 0.3s;
-    }
-
-    .elite-input::placeholder {
-      color: transparent;
-    }
-
-    .dark .elite-input {
-      border-bottom-color: #334155;
-    }
-
-    .elite-label {
-      position: absolute;
-      bottom: 8px;
-      left: 0;
-      color: #94a3b8;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      pointer-events: none;
-      font-size: 14px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transform-origin: bottom left;
-    }
-
-    .dark .elite-label {
-      color: #64748b;
-    }
-
-    .elite-input:focus~.elite-label,
-    .elite-input:not(:placeholder-shown)~.elite-label {
-      bottom: 20px;
-      font-size: 11px;
-      color: var(--theme-primary);
-      font-weight: 900;
-      letter-spacing: 1px;
-    }
-
-    .elite-underline {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 2px;
-      width: 100%;
-      background-color: var(--theme-primary);
-      transform: scaleX(0);
-      transition: transform 0.3s;
-    }
-
-    .elite-input:focus~.elite-underline {
-      transform: scaleX(1);
-    }
-  </style>
-
   <!-- Dark mode restore -->
   <script>
     if (localStorage.getItem("theme") === "dark") {
       document.documentElement.classList.add("dark");
     }
   </script>
-
-  <link rel="stylesheet" href="/index.css" />
 </head>
 
 <body>
