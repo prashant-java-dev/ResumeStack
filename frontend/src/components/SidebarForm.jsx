@@ -395,7 +395,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
             {/* Editor Header */}
             <div className="glass-card p-6 rounded-[2.5rem] flex flex-wrap justify-between items-center shadow-soft gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black" style={{ background: data.themeColor }}>R</div>
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black bg-gradient-to-br from-indigo-600 to-violet-600" style={data.themeColor.includes('gradient') ? { background: data.themeColor } : {}}>R</div>
                     <h2 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">Editor</h2>
                 </div>
                 <div className="flex gap-2 flex-wrap justify-end">
@@ -494,7 +494,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
             }
             <nav className="flex gap-2 p-2 glass-card rounded-[2rem] overflow-x-auto no-scrollbar">
                 {menuItems.map(item => (
-                    <button key={item.name} onClick={() => setActiveSection(item.name)} className={`flex-1 min-w-[90px] py-4 rounded-2xl transition-all font-black text-[9px] uppercase tracking-widest ${activeSection === item.name ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xl scale-[1.02]' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}>
+                    <button key={item.name} onClick={() => setActiveSection(item.name)} className={`flex-1 min-w-[90px] py-4 rounded-2xl transition-all font-black text-[9px] uppercase tracking-widest ${activeSection === item.name ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white dark:from-white dark:to-white dark:text-slate-900 shadow-xl scale-[1.02]' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}>
                         {item.name}
                     </button>
                 ))}
