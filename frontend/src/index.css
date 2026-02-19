@@ -6,7 +6,6 @@
   --shadow-soft: 0 20px 60px -15px rgba(0, 0, 0, 0.05);
   --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
-  /* Map existing variables to Tailwind */
   --color-theme-primary: var(--theme-primary);
   --color-glass-bg: var(--glass-bg);
   --color-glass-border: var(--glass-border);
@@ -29,14 +28,16 @@
 
 :root {
   --theme-primary: #4f46e5;
-  --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.6);
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.12);
+  /* Darker border for visibility */
   --glass-text: #1e293b;
 }
 
 .dark {
+  --theme-primary: #818cf8;
   --glass-bg: rgba(15, 23, 42, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.12);
   --glass-text: #f1f5f9;
 }
 
@@ -47,6 +48,7 @@ body {
   min-height: 100vh;
   color: var(--glass-text);
   transition: background-color 0.5s ease;
+  margin: 0;
 }
 
 .dark body {
@@ -58,6 +60,7 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--glass-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .glass-card {
@@ -65,13 +68,15 @@ body {
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-glass);
 }
 
 /* Elite Material Input Styles */
 .elite-input-container {
   position: relative;
   width: 100%;
-  margin-top: 1.5rem;
+  margin-top: 1.8rem;
+  /* Increased margin for label space */
 }
 
 .elite-input {
@@ -83,7 +88,7 @@ body {
   padding: 10px 0;
   background-color: transparent;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: all 0.3s ease;
   font-weight: 500;
   color: inherit;
 }
@@ -99,9 +104,9 @@ body {
   left: 0;
   color: #94a3b8;
   /* slate-400 */
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.1em;
@@ -109,17 +114,19 @@ body {
 
 .elite-input:focus~.elite-label,
 .elite-input:not(:placeholder-shown)~.elite-label {
-  top: -20px;
+  top: -22px;
+  /* Adjusted to prevent overlap */
   font-size: 11px;
   color: var(--theme-primary);
   font-weight: 900;
+  letter-spacing: 0.15em;
 }
 
 .elite-underline {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 2px;
+  height: 2.5px;
   width: 100%;
   background-color: var(--theme-primary);
   transform: scaleX(0);
