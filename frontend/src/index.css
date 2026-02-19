@@ -5,13 +5,14 @@
   --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
   --shadow-soft: 0 20px 60px -15px rgba(0, 0, 0, 0.05);
   --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
-  --animate-fade-up: fadeUp 0.5s ease-out forwards;
 
-  /* Map custom variables to Tailwind utilities */
-  --color-primary: var(--theme-primary);
+  /* Map existing variables to Tailwind */
+  --color-theme-primary: var(--theme-primary);
   --color-glass-bg: var(--glass-bg);
   --color-glass-border: var(--glass-border);
   --color-glass-text: var(--glass-text);
+
+  --animate-fade-up: fadeUp 0.5s ease-out forwards;
 
   @keyframes fadeUp {
     0% {
@@ -29,84 +30,89 @@
 :root {
   --theme-primary: #4f46e5;
   --glass-bg: rgba(255, 255, 255, 0.75);
-  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.6);
   --glass-text: #1e293b;
-  --body-bg: #f8fafc;
-  /* Premium off-white */
 }
 
 .dark {
-  --theme-primary: #818cf8;
-  --glass-bg: rgba(15, 23, 42, 0.8);
-  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-bg: rgba(15, 23, 42, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.08);
   --glass-text: #f1f5f9;
-  --body-bg: #020617;
-  /* Deep midnight blue */
 }
 
 body {
   font-family: 'Inter', sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: var(--body-bg);
-  color: var(--glass-text);
-  transition: background-color 0.5s ease, color 0.5s ease;
+  background: #f8fafc;
   min-height: 100vh;
-  margin: 0;
+  color: var(--glass-text);
+  transition: background-color 0.5s ease;
+}
+
+.dark body {
+  background: #020617;
+}
+
+.glass-effect {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .glass-card {
   background: var(--glass-bg);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
   border: 1px solid var(--glass-border);
 }
 
-/* Elite Input Styles */
+/* Elite Material Input Styles */
 .elite-input-container {
   position: relative;
   width: 100%;
   margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
 }
 
 .elite-input {
+  font-size: 16px;
   width: 100%;
   border: none;
   border-bottom: 2px solid #cbd5e1;
-  padding: 12px 0 8px 0;
-  background: transparent;
+  /* slate-300 */
+  padding: 10px 0;
+  background-color: transparent;
   outline: none;
+  transition: border-color 0.3s ease;
   font-weight: 500;
   color: inherit;
-  font-size: 16px;
-  transition: border-color 0.3s;
 }
 
 .dark .elite-input {
   border-bottom-color: #334155;
+  /* slate-700 */
 }
 
 .elite-label {
   position: absolute;
-  bottom: 8px;
+  top: 10px;
   left: 0;
   color: #94a3b8;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* slate-400 */
+  transition: all 0.3s ease;
   pointer-events: none;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transform-origin: bottom left;
+  letter-spacing: 0.1em;
 }
 
 .elite-input:focus~.elite-label,
 .elite-input:not(:placeholder-shown)~.elite-label {
-  bottom: 20px;
+  top: -20px;
   font-size: 11px;
   color: var(--theme-primary);
   font-weight: 900;
-  letter-spacing: 1px;
 }
 
 .elite-underline {
@@ -117,9 +123,45 @@ body {
   width: 100%;
   background-color: var(--theme-primary);
   transform: scaleX(0);
-  transition: transform 0.3s;
+  transition: transform 0.3s ease;
+  transform-origin: center;
 }
 
 .elite-input:focus~.elite-underline {
   transform: scaleX(1);
+}
+
+.theme-text {
+  background: var(--theme-gradient, #4f46e5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+  }
 }
