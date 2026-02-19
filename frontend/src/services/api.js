@@ -1,4 +1,9 @@
-const API_BASE_URL = (import.meta.env.VITE_API_Backend || "http://localhost:8080") + "/api";
+let rawBackendUrl = import.meta.env.VITE_API_Backend || "http://localhost:8080";
+// Force https if it's a railway URL to prevent Mixed Content blocking by browsers
+if (rawBackendUrl.includes("railway.app")) {
+    rawBackendUrl = rawBackendUrl.replace("http://", "https://");
+}
+const API_BASE_URL = rawBackendUrl + "/api";
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
