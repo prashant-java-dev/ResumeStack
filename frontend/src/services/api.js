@@ -60,11 +60,16 @@ export const api = {
     },
 
     getMyResumes: async () => {
-        const response = await fetch(`${API_BASE_URL}/resumes`, {
-            method: 'GET',
-            headers: getAuthHeaders()
-        });
-        if (!response.ok) throw new Error('Failed to fetch resumes');
-        return response.json();
+        try {
+            const response = await fetch(`${API_BASE_URL}/resumes`, {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
+            if (!response.ok) throw new Error(`Failed to fetch resumes: ${response.status}`);
+            return response.json();
+        } catch (err) {
+            console.error('Network Error (getMyResumes):', err.message);
+            throw err;
+        }
     }
 };
