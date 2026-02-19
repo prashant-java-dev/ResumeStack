@@ -57,7 +57,6 @@ const ai = (() => {
       console.warn('⚠️ VITE_API_KEY not set. Resume import and ATS features will not work.');
       return null;
     }
-    console.info(`Gemini model configured: ${DEFAULT_MODEL}`);
     return new GoogleGenAI({ apiKey: API_KEY });
   } catch (error) {
     console.error('Failed to initialize Gemini AI:', error);
@@ -199,8 +198,6 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
   const result = await callWithRetry(async () => {
     if (!base64Data) throw new Error("No file data provided");
 
-    console.log("Starting resume parse with Gemini API...");
-
     // User requested structure (internal prompt schema)
     const PROMPT_SCHEMA = {
       personalInfo: {
@@ -250,7 +247,6 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
 
     const text = getResponseText(response);
     const parsedData = parseJsonFromResponse(text);
-    console.log("Resume parsed successfully.");
 
     // MAP TO APP SCHEMA (The React App expects specific field names)
     return {
@@ -304,7 +300,6 @@ export const parseResumeFromBinary = async (base64Data, mimeType) => {
 // ------------------------------------------------------------------
 export const checkAtsScore = async (data) => {
   const result = await callWithRetry(async () => {
-    console.log("Starting comprehensive ATS analysis...");
 
     // Prepare detailed context
     const resumeText = `
@@ -418,7 +413,6 @@ IMPORTANT:
 
     const text = getResponseText(response);
     const result = parseJsonFromResponse(text);
-    console.log("Comprehensive ATS Analysis complete.");
 
     return result;
   });
@@ -466,7 +460,6 @@ export const generateCoverLetter = async (resume, jobTitle, company, desc) => {
 // ------------------------------------------------------------------
 export const optimizeResumeForAts = async (currentData) => {
   return callWithRetry(async () => {
-    console.log("Starting ATS Auto-Optimization...");
 
     const response = await ai.models.generateContent({
       model: DEFAULT_MODEL,
@@ -492,7 +485,6 @@ export const optimizeResumeForAts = async (currentData) => {
 
     const text = getResponseText(response);
     const optimizedData = parseJsonFromResponse(text);
-    console.log("Resume optimized successfully.");
     return optimizedData;
   });
 };

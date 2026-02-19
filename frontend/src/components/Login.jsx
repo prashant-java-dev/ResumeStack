@@ -46,7 +46,6 @@ export default function Login({ onLoginSuccess, onSwitchToSignup }) {
         localStorage.setItem('token', response.token);
         const userData = { email, name: email.split('@')[0], token: response.token };
         localStorage.setItem('user_session', JSON.stringify(userData));
-        console.log("Login successful", userData);
         onLoginSuccess(userData);
       } else {
         setError('Login failed: ' + (response.message || 'Unknown error'));
