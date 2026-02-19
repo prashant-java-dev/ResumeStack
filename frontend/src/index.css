@@ -1,16 +1,17 @@
 @import "tailwindcss";
-/* SEO & UI Update: v1.0.2 - Border Visibility Fix */
 
 @theme {
   --font-sans: "Inter", "sans-serif";
+
   --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
   --shadow-soft: 0 20px 60px -15px rgba(0, 0, 0, 0.05);
   --shadow-premium: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
 
-  --color-theme-primary: var(--theme-primary);
+  /* Map variables so they work in className="bg-glass-bg" etc */
   --color-glass-bg: var(--glass-bg);
   --color-glass-border: var(--glass-border);
   --color-glass-text: var(--glass-text);
+  --color-theme-primary: var(--theme-primary);
 
   --animate-fade-up: fadeUp 0.5s ease-out forwards;
 
@@ -30,128 +31,117 @@
 :root {
   --theme-primary: #4f46e5;
   --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(0, 0, 0, 0.12);
-  /* Darker border for visibility */
+  --glass-border: rgba(0, 0, 0, 0.1);
   --glass-text: #1e293b;
 }
 
 .dark {
   --theme-primary: #818cf8;
-  --glass-bg: rgba(15, 23, 42, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-bg: rgba(15, 23, 42, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
   --glass-text: #f1f5f9;
 }
 
+/* Global Fixes */
 body {
   font-family: 'Inter', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  background: #f8fafc;
-  min-height: 100vh;
+  background-color: #f8fafc;
   color: var(--glass-text);
-  transition: background-color 0.5s ease;
   margin: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
 .dark body {
-  background: #020617;
+  background-color: #020617;
 }
 
-.glass-effect {
-  background: var(--glass-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--glass-border);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-}
-
+/* Glass Components */
 .glass-card {
-  background: var(--glass-bg);
+  background-color: var(--glass-bg) !important;
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--glass-border) !important;
   box-shadow: var(--shadow-glass);
 }
 
-/* Elite Material Input Styles */
+.glass-effect {
+  background-color: var(--glass-bg) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+/* Elite Material Input (Absolute Visibility Fix) */
 .elite-input-container {
   position: relative;
   width: 100%;
-  margin-top: 1.8rem;
-  /* Increased margin for label space */
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .elite-input {
-  font-size: 16px;
   width: 100%;
   border: none;
-  border-bottom: 2px solid #cbd5e1;
-  /* slate-300 */
-  padding: 10px 0;
-  background-color: transparent;
-  outline: none;
-  transition: all 0.3s ease;
-  font-weight: 500;
+  border-bottom: 2px solid #cbd5e1 !important;
+  padding: 8px 0 !important;
+  background: transparent !important;
+  outline: none !important;
+  font-size: 16px;
   color: inherit;
+  transition: border-color 0.2s;
 }
 
 .dark .elite-input {
-  border-bottom-color: #334155;
-  /* slate-700 */
+  border-bottom-color: #334155 !important;
 }
 
 .elite-label {
   position: absolute;
-  top: 10px;
+  top: 8px;
   left: 0;
   color: #94a3b8;
-  /* slate-400 */
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: 0.2s ease all;
   pointer-events: none;
+  text-transform: uppercase;
   font-size: 14px;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.05em;
 }
 
+/* Float Label Up */
 .elite-input:focus~.elite-label,
 .elite-input:not(:placeholder-shown)~.elite-label {
-  top: -22px;
-  /* Adjusted to prevent overlap */
-  font-size: 11px;
-  color: var(--theme-primary);
-  font-weight: 900;
-  letter-spacing: 0.15em;
+  top: -18px !important;
+  font-size: 11px !important;
+  color: var(--theme-primary) !important;
+  font-weight: 800 !important;
 }
 
 .elite-underline {
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 2.5px;
+  height: 2px;
   width: 100%;
   background-color: var(--theme-primary);
   transform: scaleX(0);
   transition: transform 0.3s ease;
-  transform-origin: center;
 }
 
 .elite-input:focus~.elite-underline {
   transform: scaleX(1);
 }
 
+/* Utilities */
 .theme-text {
   background: var(--theme-gradient, #4f46e5);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-weight: 900;
+  font-weight: 800;
 }
 
 ::-webkit-scrollbar {
   width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -161,15 +151,4 @@ body {
 
 .dark ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.1);
-}
-
-@media print {
-  .no-print {
-    display: none !important;
-  }
-
-  body {
-    background: white !important;
-    color: black !important;
-  }
 }
