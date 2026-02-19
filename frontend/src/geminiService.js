@@ -32,9 +32,13 @@ const MOCK_ATS_RESULT = {
     skills: { score: 0, maxScore: 25, label: "Skills", status: "failed", feedback: "Unable to analyze" },
     format: { score: 0, maxScore: 10, label: "Format", status: "failed", feedback: "Unable to analyze" }
   },
+  forensicChecklist: [
+    { category: "System", status: "Warning", feedback: "API Quota Exceeded. Using mock data." }
+  ],
   checks: [],
+  keyImprovements: ["Upgrade Gemini plan", "Check API Key configuration"],
   suggestions: ["API Quota Exceeded. Please try again later."],
-  companyContextFeedback: "Analysis unavailable."
+  companyContextFeedback: "Analysis unavailable due to service limits."
 };
 
 // API Configuration

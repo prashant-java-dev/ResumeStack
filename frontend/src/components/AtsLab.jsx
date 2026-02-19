@@ -253,7 +253,7 @@ export default function AtsLab({ resume, onImport, onApplyTemplate }) {
             <div className="glass-card p-10 rounded-[3rem] shadow-soft">
               <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500 mb-8">Top Improvements</h3>
               <ul className="space-y-6">
-                {reportData.suggestions?.map((suggestion, i) => (
+                {(reportData.keyImprovements || reportData.suggestions)?.map((suggestion, i) => (
                   <li key={i} className="flex gap-4 items-start">
                     <span className="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-xs">{i + 1}</span>
                     <p className="text-sm font-medium text-slate-700 dark:text-slate-300">{suggestion}</p>
@@ -266,13 +266,13 @@ export default function AtsLab({ resume, onImport, onApplyTemplate }) {
             <div className="glass-card p-10 rounded-[3rem] shadow-soft">
               <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500 mb-8">System Checks</h3>
               <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-                {reportData.checks?.map((check, i) => (
+                {(reportData.forensicChecklist || reportData.checks)?.map((check, i) => (
                   <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-3">
-                      <div className={`w-2 h-2 rounded-full ${check.status === 'passed' ? 'bg-emerald-500' : check.status === 'warning' ? 'bg-amber-500' : 'bg-rose-500'}`}></div>
-                      <span className="font-bold text-xs text-slate-700 dark:text-slate-300">{check.label}</span>
+                      <div className={`w-2 h-2 rounded-full ${String(check.status).toLowerCase() === 'passed' ? 'bg-emerald-500' : String(check.status).toLowerCase() === 'warning' ? 'bg-amber-500' : 'bg-rose-500'}`}></div>
+                      <span className="font-bold text-xs text-slate-700 dark:text-slate-300">{check.category || check.label}</span>
                     </div>
-                    <span className={`text-[10px] font-black uppercase tracking-widest ${check.status === 'passed' ? 'text-emerald-500' : check.status === 'warning' ? 'text-amber-500' : 'text-rose-500'}`}>
+                    <span className={`text-[10px] font-black uppercase tracking-widest ${String(check.status).toLowerCase() === 'passed' ? 'text-emerald-500' : String(check.status).toLowerCase() === 'warning' ? 'text-amber-500' : 'text-rose-500'}`}>
                       {check.feedback}
                     </span>
                   </div>
