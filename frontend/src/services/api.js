@@ -1,9 +1,23 @@
-let rawBackendUrl = import.meta.env.VITE_API_Backend || "http://localhost:8080";
-// Force https if it's a railway URL to prevent Mixed Content blocking by browsers
-if (rawBackendUrl.includes("railway.app")) {
-    rawBackendUrl = rawBackendUrl.replace("http://", "https://");
-}
-const API_BASE_URL = rawBackendUrl + "/api";
+const getBaseUrl = () => {
+    let url = import.meta.env.VITE_API_Backend;
+
+    // If environment variable is missing in production, fallback to production Railway URL
+    if (!url && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        url = "https://resumestack-resumestack.up.railway.app";
+    }
+
+    url = url || "http://localhost:8080";
+
+    // Force https for production railway URLs
+    if (url.includes("railway.app")) {
+        url = url.replace("http://", "https://");
+    }
+
+    return url.replace(/\/$/, ""); // Remove trailing slash
+};
+
+const API_BASE_URL = getBaseUrl() + "/api";
+console.log('📡 API Target:', API_BASE_URL);
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');
