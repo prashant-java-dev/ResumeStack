@@ -1,4 +1,5 @@
 @import "tailwindcss";
+/* SEO & UI Update: v1.0.2 - Border Visibility Fix */
 
 @theme {
   --font-sans: "Inter", "sans-serif";
