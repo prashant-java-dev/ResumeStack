@@ -4,7 +4,7 @@ import ColorPicker from './ColorPicker';
 import ManualResumeImport from './ManualResumeImport';
 import ATSReviewModal from './ATSReviewModal';
 
-const EliteInput = ({ label, value, onChange, placeholder = "", type = "text", autoComplete = "off" }) => (
+const EliteInput = ({ label, value, onChange, placeholder = "", type = "text" }) => (
     <div className="elite-input-container">
         <input
             type={type}
@@ -12,7 +12,6 @@ const EliteInput = ({ label, value, onChange, placeholder = "", type = "text", a
             value={value === null || value === undefined ? '' : value}
             onChange={e => onChange(e.target.value)}
             placeholder=" "
-            autoComplete={autoComplete}
         />
         <label className="elite-label">{label}</label>
         <div className="elite-underline"></div>
@@ -396,14 +395,14 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
             {/* Editor Header */}
             <div className="glass-card p-6 rounded-[2.5rem] flex flex-wrap justify-between items-center shadow-soft gap-4">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black shadow-lg bg-slate-900 dark:bg-white dark:text-slate-900" style={data.themeColor && !data.themeColor.includes('gradient') ? { backgroundColor: data.themeColor } : {}}>R</div>
+                    <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-black bg-gradient-to-br from-indigo-600 to-violet-600" style={data.themeColor.includes('gradient') ? { background: data.themeColor } : {}}>R</div>
                     <h2 className="text-lg font-black tracking-tight text-slate-900 dark:text-white">Editor</h2>
                 </div>
                 <div className="flex gap-2 flex-wrap justify-end">
                     <button
                         onClick={handleAutoOptimize}
                         disabled={isOptimizing || quotaExceeded}
-                        className="px-6 py-3 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white font-black text-[10px] uppercase tracking-widest hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50"
+                        className="px-6 py-3 rounded-xl bg-indigo-600 text-white dark:bg-white dark:text-slate-900 font-black text-[10px] uppercase tracking-widest shadow-lg hover:shadow-indigo-500/25 hover:scale-105 transition-all disabled:opacity-50"
                     >
                         {isOptimizing ? 'Optimizing...' : '✨ Auto-Optimize'}
                     </button>
@@ -506,11 +505,11 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                     <div className="space-y-10 animate-fade-up">
                         <h3 className="text-xl font-black uppercase tracking-widest mb-8 text-indigo-500 dark:text-indigo-400">Contact</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                            <EliteInput label="Full Name" value={data.personalInfo.fullName} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, fullName: v } }))} autoComplete="name" />
-                            <EliteInput label="Job Title" value={data.personalInfo.jobTitle} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, jobTitle: v } }))} autoComplete="organization-title" />
-                            <EliteInput label="Email" value={data.personalInfo.email} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, email: v } }))} autoComplete="email" />
-                            <EliteInput label="Phone" value={data.personalInfo.phone} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, phone: v } }))} autoComplete="tel" />
-                            <EliteInput label="City" value={data.personalInfo.location} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, location: v } }))} autoComplete="address-level2" />
+                            <EliteInput label="Full Name" value={data.personalInfo.fullName} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, fullName: v } }))} />
+                            <EliteInput label="Job Title" value={data.personalInfo.jobTitle} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, jobTitle: v } }))} />
+                            <EliteInput label="Email" value={data.personalInfo.email} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, email: v } }))} />
+                            <EliteInput label="Phone" value={data.personalInfo.phone} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, phone: v } }))} />
+                            <EliteInput label="City" value={data.personalInfo.location} onChange={v => setData(prev => ({ ...prev, personalInfo: { ...prev.personalInfo, location: v } }))} />
                         </div>
                         <div className="pt-10 border-t border-slate-100 dark:border-slate-800">
                             <div className="flex justify-between items-center mb-4">
