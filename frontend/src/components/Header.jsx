@@ -88,7 +88,7 @@ export default function Header({ view, setView, theme, toggleTheme, isAuthentica
         ) : (
           <button
             onClick={onStartBuilding}
-            className="hidden sm:block bg-gradient-to-r from-slate-900 to-slate-800 dark:from-white dark:to-slate-100 text-white dark:text-slate-900 px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95 border border-white/10"
+            className="hidden sm:block bg-indigo-600 dark:bg-white text-white dark:text-slate-900 px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95 border border-transparent dark:border-white/10"
           >
             Start Building
           </button>
