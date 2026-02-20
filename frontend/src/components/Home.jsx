@@ -29,7 +29,7 @@ export default function Home({ onStartBuilding }) {
           </div>
 
           <h1 className="text-6xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white leading-tight">
-            Build Your <span className="bg-gradient-to-r from-indigo-500 to-blue-500 bg-clip-text text-transparent">Perfect Resume</span>
+            Build Your <span className="text-indigo-600 dark:text-indigo-400">Perfect Resume</span>
           </h1>
 
           <p className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl mx-auto">

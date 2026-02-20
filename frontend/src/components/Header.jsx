@@ -9,7 +9,7 @@ export default function Header({ view, setView, theme, toggleTheme, isAuthentica
           className="text-2xl font-black flex items-center gap-3 group text-slate-900 dark:text-white"
         >
           {/* Logo with SVG */}
-          <div className="w-10 h-10 bg-slate-900 dark:bg-white rounded-2xl flex items-center justify-center text-white dark:text-slate-900 shadow-xl group-hover:scale-110 transition-transform">
+          <div className="w-10 h-10 bg-slate-900 dark:bg-white rounded-2xl flex items-center justify-center text-white dark:text-slate-900 shadow-xl group-hover:scale-110 transition-transform bg-gradient-to-br from-indigo-600 to-violet-600 dark:from-white dark:to-white">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -28,11 +28,11 @@ export default function Header({ view, setView, theme, toggleTheme, isAuthentica
             </svg>
           </div>
           <span className="tracking-tighter font-extrabold text-slate-900 dark:text-white">
-            <span className="text-indigo-600 dark:text-indigo-400">Resume</span><span className="font-light opacity-60">Stack</span>
+            <span className="text-indigo-600 dark:text-indigo-400">Resume</span><span className="font-extrabold text-slate-700 dark:text-slate-300">Stack</span>
           </span>
         </button>
 
-        <nav className="hidden md:flex items-center gap-2">
+        <nav className="hidden md:flex items-center gap-1">
           {(isAuthenticated ? [
             { id: 'edit', label: 'Builder' },
             { id: 'ats-lab', label: 'Review' }
@@ -40,9 +40,9 @@ export default function Header({ view, setView, theme, toggleTheme, isAuthentica
             <button
               key={p.id}
               onClick={() => setView(p.id)}
-              className={`px-6 py-2.5 text-[10px] font-black uppercase tracking-[0.2em] rounded-full transition-all ${view === p.id
-                ? 'bg-white text-indigo-600 shadow-[0_10px_20px_-5px_rgba(79,70,229,0.2)] scale-105'
-                : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5'
+              className={`px-6 py-2 text-[10px] font-black uppercase tracking-[0.2em] rounded-full transition-all ${view === p.id
+                ? 'bg-white text-indigo-600 dark:text-slate-900 shadow-xl scale-105 active:scale-95'
+                : 'text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-white/50'
                 }`}
             >
               {p.label}
@@ -55,7 +55,7 @@ export default function Header({ view, setView, theme, toggleTheme, isAuthentica
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
-          className="relative w-12 h-12 glass-card rounded-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-white"
+          className="relative w-12 h-12 glass-card rounded-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-slate-500 dark:text-slate-400"
           aria-label="Toggle Theme"
         >
           {theme === 'light' ? (
@@ -76,11 +76,11 @@ export default function Header({ view, setView, theme, toggleTheme, isAuthentica
               <p className="text-sm font-black text-slate-900 dark:text-white">
                 {currentUser?.fullName || currentUser?.name || currentUser?.email}
               </p>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">Premium User</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Welcome back</p>
             </div>
             <button
               onClick={onLogout}
-              className="hidden sm:block bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-rose-100 transition-all active:scale-95"
+              className="hidden sm:block bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all"
             >
               Logout
             </button>
@@ -88,7 +88,7 @@ export default function Header({ view, setView, theme, toggleTheme, isAuthentica
         ) : (
           <button
             onClick={onStartBuilding}
-            className="hidden sm:block premium-btn bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all"
+            className="hidden sm:block bg-gradient-to-r from-slate-900 to-slate-800 dark:from-white dark:to-slate-100 text-white dark:text-slate-900 px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all hover:scale-105 active:scale-95 border border-white/10"
           >
             Start Building
           </button>

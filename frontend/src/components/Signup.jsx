@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const EliteInput = ({ label, value, onChange, placeholder = "", type = "text", autoComplete = "off" }) => (
+const EliteInput = ({ label, value, onChange, placeholder = "", type = "text" }) => (
   <div className="elite-input-container">
     <input
       type={type}
@@ -9,7 +9,6 @@ const EliteInput = ({ label, value, onChange, placeholder = "", type = "text", a
       onChange={e => onChange(e.target.value)}
       placeholder=" "
       required
-      autoComplete={autoComplete}
     />
     <label className="elite-label">{label}</label>
     <div className="elite-underline"></div>
@@ -121,7 +120,6 @@ export default function Signup({ onSignupSuccess, onSwitchToLogin }) {
               value={fullName}
               onChange={setFullName}
               placeholder="John Doe"
-              autoComplete="name"
             />
 
             <EliteInput
@@ -130,7 +128,6 @@ export default function Signup({ onSignupSuccess, onSwitchToLogin }) {
               value={email}
               onChange={setEmail}
               placeholder="you@example.com"
-              autoComplete="email"
             />
 
             <EliteInput
@@ -139,7 +136,6 @@ export default function Signup({ onSignupSuccess, onSwitchToLogin }) {
               value={password}
               onChange={setPassword}
               placeholder="••••••••"
-              autoComplete="new-password"
             />
 
             <EliteInput
@@ -148,7 +144,6 @@ export default function Signup({ onSignupSuccess, onSwitchToLogin }) {
               value={confirmPassword}
               onChange={setConfirmPassword}
               placeholder="••••••••"
-              autoComplete="new-password"
             />
 
             {error && (
