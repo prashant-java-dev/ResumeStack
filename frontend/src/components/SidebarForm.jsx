@@ -494,7 +494,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
             }
             <nav className="flex gap-2 p-2 glass-card rounded-[2rem] overflow-x-auto no-scrollbar">
                 {menuItems.map(item => (
-                    <button key={item.name} onClick={() => setActiveSection(item.name)} className={`flex-1 min-w-[90px] py-4 rounded-2xl transition-all font-black text-[9px] uppercase tracking-widest ${activeSection === item.name ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white dark:from-white dark:to-white dark:text-slate-900 shadow-xl scale-[1.02]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}>
+                    <button key={item.name} onClick={() => setActiveSection(item.name)} className={`flex-1 min-w-[90px] py-4 rounded-2xl transition-all font-black text-[9px] uppercase tracking-widest ${activeSection === item.name ? 'bg-indigo-600 text-white dark:bg-white dark:text-slate-900 shadow-xl scale-[1.02]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}>
                         {item.name}
                     </button>
                 ))}
