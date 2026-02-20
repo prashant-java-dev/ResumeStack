@@ -47,7 +47,7 @@ const normalizeModelName = (modelName) => {
   return modelName.trim().replace(/^models\//, "");
 };
 
-const DEFAULT_MODEL = normalizeModelName(import.meta.env.VITE_GEMINI_MODEL) || "gemini-1.5-flash-latest";
+const DEFAULT_MODEL = normalizeModelName(import.meta.env.VITE_GEMINI_MODEL) || "gemini-2.5-flash";
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 // Initialize AI with API key
@@ -173,7 +173,7 @@ async function callWithRetry(fn, retries = 2, delay = 1500) {
 
     if (isModelNotFound) {
       throw new Error(
-        `Gemini model "${DEFAULT_MODEL}" is unavailable for this API key. Set VITE_GEMINI_MODEL to a supported model (example: gemini-1.5-flash-latest or gemini-pro) and restart the dev server.`
+        `Gemini model "${DEFAULT_MODEL}" is unavailable for this API key. Set VITE_GEMINI_MODEL to a supported model (example: gemini-2.5-flash) and restart the dev server.`
       );
     }
 
