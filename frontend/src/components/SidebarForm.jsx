@@ -494,7 +494,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
             }
             <nav className="flex gap-2 p-2 glass-card rounded-[2rem] overflow-x-auto no-scrollbar">
                 {menuItems.map(item => (
-                    <button key={item.name} onClick={() => setActiveSection(item.name)} className={`flex-1 min-w-[90px] py-4 rounded-2xl transition-all font-black text-[9px] uppercase tracking-widest ${activeSection === item.name ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white dark:from-white dark:to-white dark:text-slate-900 shadow-xl scale-[1.02]' : 'text-slate-500 hover:text-slate-600 dark:hover:text-slate-200'}`}>
+                    <button key={item.name} onClick={() => setActiveSection(item.name)} className={`flex-1 min-w-[90px] py-4 rounded-2xl transition-all font-black text-[9px] uppercase tracking-widest ${activeSection === item.name ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white dark:from-white dark:to-white dark:text-slate-900 shadow-xl scale-[1.02]' : 'text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}>
                         {item.name}
                     </button>
                 ))}
@@ -513,7 +513,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                         </div>
                         <div className="pt-10 border-t border-slate-100 dark:border-slate-800">
                             <div className="flex justify-between items-center mb-4">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500">About Me</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">About Me</label>
                                 <button onClick={writeBioWithAi} disabled={isAiWriting || quotaExceeded} className="text-[9px] font-black bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 px-3 py-1.5 rounded-lg uppercase tracking-widest hover:scale-105 transition-all">
                                     {isAiWriting ? 'Thinking...' : '✨ AI Assist'}
                                 </button>
@@ -536,7 +536,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                                     </div>
                                 </div>
                             ))}
-                            <button onClick={() => addItem('socialLinks', { id: Date.now().toString(), platform: '', url: '' })} className="w-full py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-indigo-500 transition-all">
+                            <button onClick={() => addItem('socialLinks', { id: Date.now().toString(), platform: '', url: '' })} className="w-full py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:border-indigo-500 transition-all">
                                 + Add Social Link
                             </button>
                         </div>
@@ -559,7 +559,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                                     <EliteTextArea label="Description" value={exp.description} onChange={v => editItem('experience', exp.id, { description: v })} rows={8} />
                                 </div>
                             ))}
-                            <button onClick={() => addItem('experience', { id: Date.now().toString(), company: '', position: '', startDate: '', endDate: '', description: '', current: false })} className="w-full py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-indigo-500 transition-all">
+                            <button onClick={() => addItem('experience', { id: Date.now().toString(), company: '', position: '', startDate: '', endDate: '', description: '', current: false })} className="w-full py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:border-indigo-500 transition-all">
                                 + Add Work
                             </button>
                         </div>
@@ -582,7 +582,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                                     <EliteTextArea label="Details" value={proj.description} onChange={v => editItem('projects', proj.id, { description: v })} rows={6} />
                                 </div>
                             ))}
-                            <button onClick={() => addItem('projects', { id: Date.now().toString(), name: '', role: '', description: '', type: 'Key', link: '' })} className="w-full py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-indigo-500 transition-all">
+                            <button onClick={() => addItem('projects', { id: Date.now().toString(), name: '', role: '', description: '', type: 'Key', link: '' })} className="w-full py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:border-indigo-500 transition-all">
                                 + Add Project
                             </button>
                         </div>
@@ -605,7 +605,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                                     <EliteTextArea label="Description" value={edu.description} onChange={v => editItem('education', edu.id, { description: v })} rows={4} />
                                 </div>
                             ))}
-                            <button onClick={() => addItem('education', { id: Date.now().toString(), school: '', degree: '', startDate: '', endDate: '', description: '' })} className="w-full py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-indigo-500 transition-all">
+                            <button onClick={() => addItem('education', { id: Date.now().toString(), school: '', degree: '', startDate: '', endDate: '', description: '' })} className="w-full py-8 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-3xl text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 hover:border-indigo-500 transition-all">
                                 + Add School
                             </button>
                         </div>
@@ -617,7 +617,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                         <h3 className="text-xl font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Skills & Extras</h3>
 
                         <div className="space-y-8">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">Skills</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block">Skills</label>
                             {data.skills.map((skill, i) => (
                                 <div key={i} className="flex gap-4">
                                     <EliteInput label={`Skill #${i + 1}`} value={skill} onChange={v => {
@@ -632,7 +632,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                         </div>
 
                         <div className="pt-10 border-t border-slate-100 dark:border-slate-800 space-y-8">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">Certifications</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block">Certifications</label>
                             {data.certifications.map((cert, i) => (
                                 <div key={i} className="flex gap-4">
                                     <EliteInput label={`Certs #${i + 1}`} value={cert} onChange={v => {
@@ -647,7 +647,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                         </div>
 
                         <div className="pt-10 border-t border-slate-100 dark:border-slate-800 space-y-8">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 block">Languages</label>
+                            <label className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 block">Languages</label>
                             {data.languages.map((lang, i) => (
                                 <div key={i} className="flex gap-4">
                                     <EliteInput label={`Language #${i + 1}`} value={lang} onChange={v => {
@@ -691,7 +691,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                         </div>
                         {data.coverLetter && (
                             <div className="space-y-2 pt-6 border-t border-slate-100 dark:border-slate-800">
-                                <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest ml-1">Your Cover Letter</label>
+                                <label className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Your Cover Letter</label>
                                 <EliteTextArea rows={15} label="" value={data.coverLetter} onChange={e => setData({ ...data, coverLetter: e })} />
                             </div>
                         )}
