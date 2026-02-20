@@ -62,6 +62,7 @@ export default function AtsLab({ resume, onImport, onApplyTemplate }) {
   const [reportData, setReportData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [uiMessage, setUiMessage] = useState(null);
   const fileInputRef = useRef(null);
 
   const createId = () => Math.random().toString(36).slice(2, 11);
@@ -75,10 +76,15 @@ export default function AtsLab({ resume, onImport, onApplyTemplate }) {
       const errorMsg = e?.message || "System busy. Please try again later.";
       const isQuotaError = errorMsg.includes('quota') || errorMsg.includes('upgrade');
 
+      const showStatus = (title, text, type = 'error') => {
+        setUiMessage({ title, text, type });
+        setTimeout(() => setUiMessage(null), 8000);
+      };
+
       if (isQuotaError) {
-        alert(`⚠️ Quota Limit Reached\n\n${errorMsg}`);
+        showStatus("Quota Limit", "Gemini AI daily limit reached. Please wait for reset.");
       } else {
-        alert(`ATS Analysis Error: ${errorMsg}`);
+        showStatus("Analysis Error", errorMsg);
       }
       console.error("ATS Analysis Error:", e);
     }
@@ -153,7 +159,8 @@ export default function AtsLab({ resume, onImport, onApplyTemplate }) {
         } catch (error) {
           const errorMsg = error?.message || "Error reading file. Please use a clean PDF.";
           console.error("Resume Import Error Details:", error);
-          alert(`Resume Import Failed: ${errorMsg}`);
+          setUiMessage({ title: "Import Failed", text: errorMsg, type: "error" });
+          setTimeout(() => setUiMessage(null), 8000);
         } finally {
           setIsImporting(false);
           setIsLoading(false);
@@ -169,7 +176,26 @@ export default function AtsLab({ resume, onImport, onApplyTemplate }) {
   };
 
   return (
-    <div className="py-12 md:py-20 space-y-20 animate-fade-up max-w-6xl mx-auto px-6">
+    <div className="py-12 md:py-20 space-y-20 animate-fade-up max-w-6xl mx-auto px-6 relative">
+      {/* Notification Toast */}
+      {uiMessage && (
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-6 animate-fade-up">
+          <div className={`glass-card p-6 rounded-[2rem] border-2 shadow-premium flex items-center justify-between ${uiMessage.type === 'error' ? 'border-rose-500/30 bg-rose-50/10 dark:bg-rose-900/10' :
+              'border-amber-500/30 bg-amber-50/10 dark:bg-amber-900/10'
+            }`}>
+            <div className="flex items-center gap-4">
+              <span className="text-2xl">{uiMessage.type === 'error' ? '⚠️' : 'ℹ️'}</span>
+              <div>
+                <h4 className={`font-black text-xs uppercase tracking-widest ${uiMessage.type === 'error' ? 'text-rose-600 dark:text-rose-400' : 'text-amber-600 dark:text-amber-400'
+                  }`}>{uiMessage.title}</h4>
+                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400">{uiMessage.text}</p>
+              </div>
+            </div>
+            <button onClick={() => setUiMessage(null)} className="text-slate-400 hover:text-slate-600 ml-4">✕</button>
+          </div>
+        </div>
+      )}
+
       <div className="text-center space-y-6">
         <h2 className="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 dark:text-white">
           Smart Resume Check

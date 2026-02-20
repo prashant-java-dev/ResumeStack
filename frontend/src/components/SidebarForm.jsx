@@ -62,17 +62,20 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
     const [companyNameForCL, setCompanyNameForCL] = useState('');
     const [jobDescriptionForCL, setJobDescriptionForCL] = useState('');
     const [quotaExceeded, setQuotaExceeded] = useState(false);
+    const [uiMessage, setUiMessage] = useState(null);
 
     const fileInputRef = useRef(null);
 
+    const showStatus = (title, text, type = 'error') => {
+        setUiMessage({ title, text, type });
+        setTimeout(() => setUiMessage(null), 8000);
+    };
+
     const showQuotaAlert = () => {
-        alert(
-            "API quota limit reached for Gemini.\n\n" +
-            "Try one of these:\n" +
-            "- Wait for quota reset (usually daily)\n" +
-            "- Use Manual Input for now\n" +
-            "- Upgrade Gemini API plan\n\n" +
-            "Quota docs: https://ai.google.dev/gemini-api/docs/rate-limits"
+        showStatus(
+            "API Quota Reached",
+            "Gemini AI limit reached. Please use manual input or wait for reset.",
+            "error"
         );
     };
 
@@ -176,7 +179,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                     } else {
                         console.error("Resume Import Error Details:", err);
                         console.error("Error stack:", err?.stack);
-                        alert(`Resume import failed.\n\n${errorMsg}`);
+                        showStatus("Import Failed", errorMsg);
                     }
                 } finally {
                     setIsImporting(false);
@@ -193,7 +196,10 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
 
     const handleAutoOptimize = async () => {
         if (quotaExceeded) return showQuotaAlert();
-        if (!data.personalInfo.fullName) return alert("Please add at least your name and some experience/skills first.");
+        if (!data.personalInfo.fullName) {
+            showStatus("Required Info", "Please add your name and some experience/skills first.", "warning");
+            return;
+        }
         setIsOptimizing(true);
         try {
             const optimizedData = await optimizeResumeForAts(data);
@@ -236,7 +242,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                         console.error("Post-optimization ATS check failed", e);
                     }
                 }
-                alert("✨ Resume Optimized! Check your improved content and new ATS score.");
+                showStatus("✨ Optimized!", "Check your improved content and new ATS score.", "success");
             }
         } catch (error) {
             if (isQuotaError(error)) {
@@ -245,7 +251,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                 showQuotaAlert();
             } else {
                 console.error("Optimization failed:", error);
-                alert("Optimization failed. Please check your data or try again later.");
+                showStatus("Optimization Failed", "Could not optimize at this time.");
             }
         } finally {
             setIsOptimizing(false);
@@ -255,7 +261,8 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
     const handleAnalyzeDraft = async () => {
         if (quotaExceeded) return showQuotaAlert();
         if (!data.personalInfo.fullName && !data.personalInfo.email) {
-            return alert("Please add at least your name and email to analyze your resume.");
+            showStatus("Required Info", "Add your name and email to analyze.", "warning");
+            return;
         }
         setIsAnalyzing(true);
         try {
@@ -272,7 +279,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                 showQuotaAlert();
             } else {
                 console.error("ATS Analysis failed:", error);
-                alert("Failed to analyze resume. Please check your data or try again.");
+                showStatus("Analysis Failed", "Failed to analyze resume.");
             }
         } finally {
             setIsAnalyzing(false);
@@ -281,7 +288,10 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
 
     const writeBioWithAi = async () => {
         if (quotaExceeded) return showQuotaAlert();
-        if (!data.personalInfo.jobTitle) return alert("Enter your job title first.");
+        if (!data.personalInfo.jobTitle) {
+            showStatus("Missing Title", "Enter your job title first.", "warning");
+            return;
+        }
         setIsAiWriting(true);
         try {
             const result = await optimizeSummary(data.personalInfo.jobTitle, data.skills);
@@ -293,7 +303,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                 showQuotaAlert();
             } else {
                 console.error("Summary generation failed:", error);
-                alert("Failed to generate summary. Please try again.");
+                showStatus("Summary Failed", "Failed to generate summary.");
             }
         } finally {
             setIsAiWriting(false);
@@ -303,7 +313,8 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
     const handleGenerateCoverLetter = async () => {
         if (quotaExceeded) return showQuotaAlert();
         if (!jobTitleForCL || !companyNameForCL || !jobDescriptionForCL) {
-            return alert("Please fill in all job details (title, company, description) to generate a cover letter.");
+            showStatus("Missing Details", "Fill in job title, company, and description.", "warning");
+            return;
         }
         setIsGeneratingCoverLetter(true);
         try {
@@ -321,7 +332,7 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
                 showQuotaAlert();
             } else {
                 console.error("Cover letter generation failed:", error);
-                alert("Failed to generate cover letter. Please try again.");
+                showStatus("Generation Failed", "Failed to create cover letter.");
             }
         } finally {
             setIsGeneratingCoverLetter(false);
@@ -369,7 +380,29 @@ export default function SidebarForm({ data, setData, template, setTemplate }) {
 
     // In the return block, inside the header div:
     return (
-        <div className="space-y-6">
+        <div className="space-y-6 relative">
+            {/* Notification Toast */}
+            {uiMessage && (
+                <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-6 animate-fade-up">
+                    <div className={`glass-card p-6 rounded-[2rem] border-2 shadow-premium flex items-center justify-between ${uiMessage.type === 'error' ? 'border-rose-500/30 bg-rose-50/10 dark:bg-rose-900/10' :
+                            uiMessage.type === 'success' ? 'border-emerald-500/30 bg-emerald-50/10 dark:bg-emerald-900/10' :
+                                'border-amber-500/30 bg-amber-50/10 dark:bg-amber-900/10'
+                        }`}>
+                        <div className="flex items-center gap-4">
+                            <span className="text-2xl">{uiMessage.type === 'error' ? '⚠️' : uiMessage.type === 'success' ? '✨' : 'ℹ️'}</span>
+                            <div>
+                                <h4 className={`font-black text-xs uppercase tracking-widest ${uiMessage.type === 'error' ? 'text-rose-600 dark:text-rose-400' :
+                                        uiMessage.type === 'success' ? 'text-emerald-600 dark:text-emerald-400' :
+                                            'text-amber-600 dark:text-amber-400'
+                                    }`}>{uiMessage.title}</h4>
+                                <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400">{uiMessage.text}</p>
+                            </div>
+                        </div>
+                        <button onClick={() => setUiMessage(null)} className="text-slate-400 hover:text-slate-600 ml-4">✕</button>
+                    </div>
+                </div>
+            )}
+
             {/* ATS Result */}
             {atsResult && (
                 <div
